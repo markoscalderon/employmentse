@@ -55,14 +55,46 @@ public class TSVParser extends AbstractParser {
 
             xhtml.startDocument();
 
-            xhtml.startElement("p");
-            char[] buffer = new char[4096];
-            int n = reader.read(buffer);
-            while (n != -1) {
-                xhtml.characters(buffer, 0, n);
-                n = reader.read(buffer);
-            }
-            xhtml.endElement("p");
+            xhtml.startElement("table");
+            
+            xhtml.startElement("tr");
+            
+            xhtml.startElement("th");
+            xhtml.characters("column1");
+            xhtml.endElement("th");
+
+            xhtml.startElement("th");
+            xhtml.characters("column2");
+            xhtml.endElement("th");
+            
+            xhtml.endElement("tr");
+            
+            xhtml.startElement("tr");
+
+            xhtml.startElement("td");
+            xhtml.characters("row1col1");
+            xhtml.endElement("td");
+            
+            xhtml.startElement("td");
+            xhtml.characters("row1col2");
+            xhtml.endElement("td");
+            
+            xhtml.endElement("tr");
+            
+            
+            xhtml.startElement("tr");
+
+            xhtml.startElement("td");
+            xhtml.characters("row2col1");
+            xhtml.endElement("td");
+            
+            xhtml.startElement("td");
+            xhtml.characters("row2col2");
+            xhtml.endElement("td");
+            
+            xhtml.endElement("tr");
+            
+            xhtml.endElement("table");
 
             xhtml.endDocument();
             
