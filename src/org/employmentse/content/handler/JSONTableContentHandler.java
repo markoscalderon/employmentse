@@ -1,19 +1,27 @@
 package org.employmentse.content.handler;
 
+import java.io.BufferedOutputStream;
+import java.io.BufferedWriter;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.tika.sax.SafeContentHandler;
 import org.apache.tika.sax.ToTextContentHandler;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
+import org.xml.sax.helpers.DefaultHandler;
 
-public class JSONTableContentHandler extends  ToTextContentHandler {
+public class JSONTableContentHandler extends SafeContentHandler {
 
-	private String TABLE = "table";
-	private String TD = "td";
-	private String TH = "th";
-	private String TR = "tr";
+	private static String TABLE = "table";
+	private static String TD = "td";
+	private static String TH = "th";
+	private static String TR = "tr";
 	
 	private enum DocumentPosition {
 		STARTING,
@@ -24,16 +32,18 @@ public class JSONTableContentHandler extends  ToTextContentHandler {
 	private boolean open = false; 
 	
 	private DocumentPosition status = DocumentPosition.STARTING;
-	List<String> headers = new ArrayList<String>();
-	String currentElement = "";
-	List<String> currentRow = new ArrayList<String>(); 
+	private List<String> headers = new ArrayList<String>();
 	
+	private String currentElement = "";
+	private List<String> currentRow = new ArrayList<String>(); 
 	
-	public JSONTableContentHandler() {
-	}
+	private final String directory;
+	private int rowNumber = 0; 
 	
-	public JSONTableContentHandler(OutputStream stream) {
-		super(stream);
+	public JSONTableContentHandler(String directory) {
+		super(new DefaultHandler());
+		
+		this.directory = directory;
 	}
 	
 	@Override
@@ -87,24 +97,40 @@ public class JSONTableContentHandler extends  ToTextContentHandler {
 				System.err.println("size = " + currentRow.size() + " instead of " + headers.size());
 				System.exit(1);
 			} else {
-				System.out.println("{");
-				for (int i = 0; i < headers.size(); i++) {
-					//write to json parellel-y
-					String jsonRow = headers.get(i) + ": " + currentRow.get(i);
-					if (i != headers.size()-1) {
-						jsonRow += ", ";
-					}
-						
-					System.out.println("\t" + jsonRow);
-					
-				}
-				System.out.println("}");
-				
+				writeRowToFile(this.directory + "/" + Integer.toString(rowNumber) + ".json");
 				currentRow.clear();
+				rowNumber++;
 			}
 			
 		}
 		
+	}
+	
+	private void writeRowToFile(String filename) {
+		Writer writer = null;
+		try {
+		    writer = new BufferedWriter(new OutputStreamWriter(
+		          new FileOutputStream(filename), "utf-8"));
+		    
+		    writer.write("{\n");
+			for (int i = 0; i < headers.size(); i++) {
+				//write to json parellel-y
+				String jsonRow = headers.get(i) + ": " + currentRow.get(i);
+				if (i != headers.size()-1) {
+					jsonRow += ", ";
+				}
+					
+				writer.write("\t" + jsonRow + "\n");
+				
+			}
+			writer.write("}\n");
+			
+		    
+		} catch (IOException ex) {
+		  // report
+		} finally {
+		   try {writer.close();} catch (Exception ex) {}
+		}
 	}
 
 	@Override

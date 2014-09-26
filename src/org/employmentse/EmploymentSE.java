@@ -1,6 +1,7 @@
 package org.employmentse;
 
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -19,7 +20,8 @@ public class EmploymentSE {
 		System.out.println("HW1");
 		
 		InputStream input = new FileInputStream("assets/test.txt");
-		ContentHandler handler = new JSONTableContentHandler();
+		
+		ContentHandler handler = new JSONTableContentHandler("assets/output");
         Metadata metadata = new Metadata();
         TSVParser parser = new TSVParser();
         parser.parse(input, handler, metadata, new ParseContext());
