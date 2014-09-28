@@ -19,17 +19,39 @@ public class EmploymentSE {
 	public static void main(String[] args) throws IOException, SAXException, TikaException {
 		System.out.println("HW1");
 		
-		InputStream input = new FileInputStream("assets/test.txt");
+		String[] headers = 
+				{"Posted Date",
+				"Location",
+				"Department",
+				"Title",
+				"EMPTY",
+				"Salary",
+				"Start",
+				"Duration",
+				"Job Type",
+				"Applications",
+				"Company",
+				"Contact Person",
+				"Phone Number",
+				"Fax Number",
+				"Location",
+				"Latitude",
+				"Longitude",
+				"First Seen Date",
+				"URL",
+				"Last Seen Date"};
+		
+		InputStream input = new FileInputStream("assets/test.tsv");
 		
 		ContentHandler handler = new JSONTableContentHandler("assets/output");
         Metadata metadata = new Metadata();
-        TSVParser parser = new TSVParser();
+        TSVParser parser = new TSVParser(headers);
         parser.parse(input, handler, metadata, new ParseContext());
         
-        String plainText = handler.toString();
-        
-        System.out.println("handler");
-        System.out.println(plainText);
+//        String plainText = handler.toString();
+//        
+//        System.out.println("handler");
+//        System.out.println(plainText);
 	}
 	
 }

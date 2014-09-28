@@ -1,17 +1,14 @@
 package org.employmentse.content.handler;
 
-import java.io.BufferedOutputStream;
 import java.io.BufferedWriter;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.tika.sax.SafeContentHandler;
-import org.apache.tika.sax.ToTextContentHandler;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
@@ -88,7 +85,6 @@ public class JSONTableContentHandler extends SafeContentHandler {
 			throws SAXException {
 
 		open = false;
-		
 		
 		if (localName.equals(TR) && status == DocumentPosition.CONTENT) {
 			
