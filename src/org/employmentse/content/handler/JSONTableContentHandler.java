@@ -26,17 +26,15 @@ public class JSONTableContentHandler extends SafeContentHandler {
 		CONTENT
 	}
 	
-	private boolean open = false;
-	private boolean characters = false;
-	
-	private DocumentPosition status = DocumentPosition.STARTING;
-	private List<String> headers = new ArrayList<String>();
-	
+	private DocumentPosition documentPosition = DocumentPosition.STARTING;
 	private String currentElement = "";
+	private int rowNumber = 0; 
+	
+	private List<String> headers = new ArrayList<String>();
 	private List<String> currentRow = new ArrayList<String>(); 
+	private String cellvalue = "";
 	
 	private final String directory;
-	private int rowNumber = 0; 
 	
 	public JSONTableContentHandler(String directory) {
 		super(new DefaultHandler());
@@ -48,57 +46,45 @@ public class JSONTableContentHandler extends SafeContentHandler {
 	public void characters(char[] ch, int start, int length) throws SAXException {
 		super.characters(ch, start, length);
 		
-		if (status == DocumentPosition.HEADER_ROW && currentElement.equals(TH) && open) {
-			headers.add(new String(ch));
-			characters = true;
-		}
-		
-		if (status == DocumentPosition.CONTENT && currentElement.equals(TD) && open) {
-			currentRow.add(new String(ch));
-			characters = true;
-		}
+		cellvalue += new String(ch);
 		
 	}
 	
 	@Override
 	public void startElement(String uri, String localName, String qName,
 			Attributes attributes) throws SAXException {
-		if (!localName.equals(qName)) {
-			System.err.println("Localname != qName, whats the problem");
-			System.err.println("localName = " + localName);
-			System.err.println("qName = " + qName);
-			System.exit(1);
-		}
+		
+		validateLocalQName(localName, qName);
 		
 		currentElement = localName;
-		open = true;
-		characters = false;
 		
 		if (currentElement.equals(TABLE)) {
-			status = DocumentPosition.STARTING;
-		} else if (currentElement.equals(TR) && status == DocumentPosition.STARTING){
-			status = DocumentPosition.HEADER_ROW;
-		} else if (currentElement.equals(TR) && status == DocumentPosition.HEADER_ROW) {
-			status = DocumentPosition.CONTENT;
+			documentPosition = DocumentPosition.STARTING;
+		} else if (currentElement.equals(TR) && documentPosition == DocumentPosition.STARTING){
+			documentPosition = DocumentPosition.HEADER_ROW;
+		} else if (currentElement.equals(TR) && documentPosition == DocumentPosition.HEADER_ROW) {
+			documentPosition = DocumentPosition.CONTENT;
 		}
 		
+		if (currentElement.equals(TH) || currentElement.equals(TD)) {
+			cellvalue = "";
+		}
 	}
 
 	@Override
 	public void endElement(String uri, String localName, String qName)
 			throws SAXException {
 
-		open = false;
+		validateLocalQName(localName, qName);
 		
-		if (localName.equals(TD)&&!characters){
-			currentRow.add("");
+		if (currentElement.equals(TH)) {
+			headers.add(cellvalue);
+		} else if(currentElement.equals(TD)) {
+			currentRow.add(cellvalue);
 		}
 		
-		characters = false;
-		
-		if (localName.equals(TR) && status == DocumentPosition.CONTENT) {
+		if (localName.equals(TR) && documentPosition == DocumentPosition.CONTENT) {
 			
-			System.out.println(currentRow);
 			if (currentRow.size() != headers.size()) {
 				
 				System.err.println("A row didn't fill up to the proper size!!");
@@ -140,11 +126,14 @@ public class JSONTableContentHandler extends SafeContentHandler {
 		   try {writer.close();} catch (Exception ex) {}
 		}
 	}
-
-	@Override
-	public void endDocument() throws SAXException {
-		System.out.println(headers);
+	
+	private void validateLocalQName(String localName, String qName) {
+		if (!localName.equals(qName)) {
+			System.err.println("Localname != qName, whats the problem");
+			System.err.println("localName = " + localName);
+			System.err.println("qName = " + qName);
+			System.exit(1);
+		}
 	}
-
 	
 }
