@@ -66,7 +66,7 @@ public class TSVParser extends AbstractParser
             }
             xhtml.endElement("tr");
             
-            char[] bufferCharacters = new char[4094];
+            char[] bufferCharacters = new char[64096];
             int n = reader.read(bufferCharacters);
             int bufferBlock=1;                                  
             while (n!=-1) 
@@ -90,7 +90,7 @@ public class TSVParser extends AbstractParser
             		else if (nextElement.equals(newlineTag)){xhtml.endElement("td"); xhtml.endElement("tr");}            		
             	}
             	bufferBlock++;            	
-            	bufferCharacters = new char[4096];        		
+            	bufferCharacters = new char[64096];        		
                 n = reader.read(bufferCharacters);
             }            
             xhtml.endElement("td");

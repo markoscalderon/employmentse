@@ -26,7 +26,8 @@ public class JSONTableContentHandler extends SafeContentHandler {
 		CONTENT
 	}
 	
-	private boolean open = false; 
+	private boolean open = false;
+	private boolean characters = false;
 	
 	private DocumentPosition status = DocumentPosition.STARTING;
 	private List<String> headers = new ArrayList<String>();
@@ -49,10 +50,12 @@ public class JSONTableContentHandler extends SafeContentHandler {
 		
 		if (status == DocumentPosition.HEADER_ROW && currentElement.equals(TH) && open) {
 			headers.add(new String(ch));
+			characters = true;
 		}
 		
 		if (status == DocumentPosition.CONTENT && currentElement.equals(TD) && open) {
 			currentRow.add(new String(ch));
+			characters = true;
 		}
 		
 	}
@@ -69,6 +72,7 @@ public class JSONTableContentHandler extends SafeContentHandler {
 		
 		currentElement = localName;
 		open = true;
+		characters = false;
 		
 		if (currentElement.equals(TABLE)) {
 			status = DocumentPosition.STARTING;
@@ -86,9 +90,17 @@ public class JSONTableContentHandler extends SafeContentHandler {
 
 		open = false;
 		
+		if (localName.equals(TD)&&!characters){
+			currentRow.add("");
+		}
+		
+		characters = false;
+		
 		if (localName.equals(TR) && status == DocumentPosition.CONTENT) {
 			
+			System.out.println(currentRow);
 			if (currentRow.size() != headers.size()) {
+				
 				System.err.println("A row didn't fill up to the proper size!!");
 				System.err.println("size = " + currentRow.size() + " instead of " + headers.size());
 				System.exit(1);
