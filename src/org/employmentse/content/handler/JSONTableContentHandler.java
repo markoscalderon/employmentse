@@ -89,6 +89,8 @@ public class JSONTableContentHandler extends SafeContentHandler {
 				
 				System.err.println("A row didn't fill up to the proper size!!");
 				System.err.println("size = " + currentRow.size() + " instead of " + headers.size());
+				System.err.println("headers = " + headers);
+				System.err.println("currentRow = " + currentRow);
 				System.exit(1);
 			} else {
 				writeRowToFile(this.directory + "/" + Integer.toString(rowNumber) + ".json");
