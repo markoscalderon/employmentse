@@ -74,6 +74,15 @@ public class TSVParser extends AbstractParser
             	String[] bufferElements = new String(bufferCharacters)
             	.replaceAll("[\\t]",	"\t"+tablineTag+"\t")
             	.replaceAll("[\\r\\n]", "\n"+newlineTag+"\n")
+            	.replaceAll("Ã©","é")
+            	.replaceAll("Ã³","ó")
+            	.replaceAll("Ã¡","á")
+            	.replaceAll("Ãº","ú")
+            	.replaceAll("Ã­" ,"í")
+            	.replaceAll("Ã€","à")
+            	.replaceAll("ÂŽ","'")
+            	.replaceAll("Â°","°")
+            	.replaceAll("Ã±","ñ")
             	.split("[\\t\\r\\n]+"); 
             	
             	if (bufferBlock==1) {xhtml.startElement("tr"); xhtml.startElement("td");}            	            
