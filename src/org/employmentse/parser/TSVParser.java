@@ -103,7 +103,7 @@ public class TSVParser extends AbstractParser
                 n = reader.read(bufferCharacters);
             }            
             xhtml.endElement("td");
-			xhtml.endElement("tr");
+            xhtml.endElement("tr");
             xhtml.endElement("table");
             xhtml.endDocument();            
         }        
