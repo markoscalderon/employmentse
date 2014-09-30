@@ -14,6 +14,9 @@ tmp/
 local.properties
 .settings/
 .loadpath
+.DS_Store
+src/.DS_Store
+src/org/.DS_Store
 
 # External tool builders
 .externalToolBuilders/
