@@ -17,7 +17,8 @@ import org.xml.sax.SAXException;
 public class EmploymentSE {
 
 	public static void main(String[] args) throws IOException, SAXException, TikaException {
-		String[] headers = {
+		String[] headers = 
+					{
 					"Posted Date",
 					"Location",
 					"Department",
@@ -44,20 +45,20 @@ public class EmploymentSE {
 		
 //		========================= OUTPUT JSON FILES ==========================//  
 		ContentHandler handler = new JSONTableContentHandler("assets/output");
-        Metadata metadata = new Metadata();
-        TSVParser parser = new TSVParser(headers);
-        parser.parse(input, handler, metadata, new ParseContext());
+		Metadata metadata = new Metadata();
+		TSVParser parser = new TSVParser(headers);
+		parser.parse(input, handler, metadata, new ParseContext());
 //		======================================================================//  
 		
 //		========================= OUTPUT XHTML FILE ==========================//  		
 //		ContentHandler handler = new ToXMLContentHandler();
-//        Metadata metadata = new Metadata();
-//        TSVParser parser = new TSVParser(headers);
-//        parser.parse(input, handler, metadata, new ParseContext());
+//		Metadata metadata = new Metadata();
+//		TSVParser parser = new TSVParser(headers);
+//		parser.parse(input, handler, metadata, new ParseContext());
 //                                      
-//        PrintWriter writer = new PrintWriter("assets/output/JobPositions.xhtml","UTF-8");
-//        writer.println(handler.toString()); 
-//        writer.close();	
+//		PrintWriter writer = new PrintWriter("assets/output/JobPositions.xhtml","UTF-8");
+//		writer.println(handler.toString()); 
+//		writer.close();	
 //		======================================================================//
                
         System.out.println("Job processing has finished!");
