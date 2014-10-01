@@ -9,6 +9,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.tika.sax.SafeContentHandler;
+import org.employmentse.deduplication.Deduplicator;
+import org.employmentse.deduplication.FingerPrint;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
@@ -35,6 +37,8 @@ public class JSONTableContentHandler extends SafeContentHandler {
 	private String cellvalue = "";
 	
 	private final String directory;
+	
+	private final Deduplicator deduplicator = new Deduplicator(); 
 	
 	public JSONTableContentHandler(String directory) {
 		super(new DefaultHandler());
@@ -93,9 +97,13 @@ public class JSONTableContentHandler extends SafeContentHandler {
 				System.err.println("currentRow = " + currentRow);
 				System.exit(1);
 			} else {
-				writeRowToFile(this.directory + "/" + Integer.toString(rowNumber) + ".json");
+				FingerPrint fp1 = new FingerPrint(currentRow);
+				if (!deduplicator.isDuplicate(fp1)) {
+					writeRowToFile(this.directory + "/" + Integer.toString(rowNumber) + ".json");
+					rowNumber++;
+				}
+				deduplicator.addJob(fp1);
 				currentRow.clear();
-				rowNumber++;
 			}
 			
 		}
