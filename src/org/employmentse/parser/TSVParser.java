@@ -38,15 +38,15 @@ public class TSVParser extends AbstractParser
 	
 	private static final ServiceLoader LOADER = new ServiceLoader(TSVParser.class.getClassLoader());
 
-    private static final Set<MediaType> SUPPORTED_TYPES = Collections.singleton(MediaType.TEXT_PLAIN);    
-    
+    private static final Set<MediaType> SUPPORTED_TYPES = Collections.singleton(MediaType.text("tsv"));  
+	
     public void parse(InputStream stream, ContentHandler handler, Metadata metadata, ParseContext context) throws IOException, SAXException, TikaException 
     {
         AutoDetectReader reader = new AutoDetectReader(new CloseShieldInputStream(stream), metadata,context.get(ServiceLoader.class, LOADER));         
         try 
         {	        	            
             Charset charset = reader.getCharset();
-            MediaType type = new MediaType(MediaType.TEXT_PLAIN, charset);
+            MediaType type = new MediaType(MediaType.text("tsv"), charset);
             metadata.set(Metadata.CONTENT_TYPE, type.toString());
             metadata.set(Metadata.CONTENT_ENCODING, charset.name());
             
@@ -74,15 +74,16 @@ public class TSVParser extends AbstractParser
             	String[] bufferElements = new String(bufferCharacters)
             	.replaceAll("[\\t]",	"\t"+tablineTag+"\t")
             	.replaceAll("[\\r\\n]", "\n"+newlineTag+"\n")
-            	.replaceAll("Ã©","é")
-            	.replaceAll("Ã³","ó")
-            	.replaceAll("Ã¡","á")
-            	.replaceAll("Ãº","ú")
-            	.replaceAll("Ã­" ,"í")
-            	.replaceAll("Ã€","à")
-            	.replaceAll("ÂŽ","'")
-            	.replaceAll("Â°","°")
-            	.replaceAll("Ã±","ñ")
+            	.replaceAll("Ã©","é").replaceAll("√©","é")
+            	.replaceAll("Ã³","ó").replaceAll("√≥","ó")
+            	.replaceAll("Ã¡","á").replaceAll("√°","á")
+            	.replaceAll("Ãº","ú").replaceAll("√∫","ú")
+            	.replaceAll("Ã­" ,"í").replaceAll("√≠","í")
+            	.replaceAll("Ã€","à").replaceAll("√§","à")
+            	.replaceAll("ÂŽ","'").replaceAll("Ã¤","à")
+            	.replaceAll("Â´","'").replaceAll("¬¥","'")
+            	.replaceAll("Â°","°").replaceAll("¬∞","°")
+            	.replaceAll("Ã±","ñ").replaceAll("√±","ñ")
             	.split("[\\t\\r\\n]+"); 
             	
             	if (bufferBlock==1) {xhtml.startElement("tr"); xhtml.startElement("td");}            	            
