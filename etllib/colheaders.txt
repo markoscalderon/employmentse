@@ -1,20 +1,20 @@
-postedDate
-location
-department
-title
-emptycol
-salary
-start
-duration
-jobtype
-applications
-company
-contactPerson
-phoneNumber
-faxNumber
-location
-latitude
-longitude
-firstSeenDate
-url
-lastSeenDate
+Posted Date
+Location
+Department
+Title
+EMPTY
+Salary
+Start
+Duration
+Job Type
+Applications
+Company
+Contact Person
+Phone Number
+Fax Number
+Location
+Latitude
+Longitude
+First Seen Date
+URL
+Last Seen Date
