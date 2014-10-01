@@ -17,26 +17,28 @@ import org.xml.sax.SAXException;
 public class EmploymentSE {
 
 	public static void main(String[] args) throws IOException, SAXException, TikaException {
-		String[] headers = {"Posted Date",
-				"Location",
-				"Department",
-				"Title",
-				"EMPTY",
-				"Salary",
-				"Start",
-				"Duration",
-				"Job Type",
-				"Applications",
-				"Company",
-				"Contact Person",
-				"Phone Number",
-				"Fax Number",
-				"Location",
-				"Latitude",
-				"Longitude",
-				"First Seen Date",
-				"URL",
-				"Last Seen Date"};
+		String[] headers = {
+					"Posted Date",
+					"Location",
+					"Department",
+					"Title",
+					"EMPTY",
+					"Salary",
+					"Start",
+					"Duration",
+					"Job Type",
+					"Applications",
+					"Company",
+					"Contact Person",
+					"Phone Number",
+					"Fax Number",
+					"Location",
+					"Latitude",
+					"Longitude",
+					"First Seen Date",
+					"URL",
+					"Last Seen Date"
+					};
 		
 		InputStream input = new FileInputStream("assets/test.tsv");
 		
