@@ -30,7 +30,7 @@ public class JSONTableContentHandler extends SafeContentHandler {
 	
 	private DocumentPosition documentPosition = DocumentPosition.STARTING;
 	private String currentElement = "";
-	private int rowNumber = 0; 
+	private int rowNumber = 1; 
 	
 	private List<String> headers = new ArrayList<String>();
 	private List<String> currentRow = new ArrayList<String>(); 
@@ -117,10 +117,10 @@ public class JSONTableContentHandler extends SafeContentHandler {
 		          new FileOutputStream(filename), "utf-8"));
 		    
 		    writer.write("{\n");
-			for (int i = 0; i < headers.size(); i++) {
+			for (int i = 0; i < headers.size()-1; i++) {
 				//write to json parellel-y
-				String jsonRow = headers.get(i) + ": " + currentRow.get(i);
-				if (i != headers.size()-1) {
+				String jsonRow = "\""+headers.get(i) + "\": \"" + currentRow.get(i)+"\"";
+				if (i != headers.size()-2) {
 					jsonRow += ", ";
 				}
 					
