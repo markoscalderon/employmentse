@@ -39,11 +39,13 @@ public class JSONTableContentHandler extends SafeContentHandler {
 	private final String directory;
 	
 	private final Deduplicator deduplicator = new Deduplicator(); 
+	private boolean enableDeduplication = false;
 	
-	public JSONTableContentHandler(String directory) {
+	public JSONTableContentHandler(String directory, boolean enableDeduplication) {
 		super(new DefaultHandler());
 		
 		this.directory = directory;
+		this.enableDeduplication = enableDeduplication;
 	}
 	
 	@Override
@@ -97,12 +99,21 @@ public class JSONTableContentHandler extends SafeContentHandler {
 				System.err.println("currentRow = " + currentRow);
 				System.exit(1);
 			} else {
-				FingerPrint fp1 = new FingerPrint(currentRow);
-				if (!deduplicator.isDuplicate(fp1)) {
+				boolean addRow = true; 
+				
+				if (enableDeduplication) {
+					FingerPrint fp1 = new FingerPrint(currentRow);
+					if (deduplicator.isDuplicate(fp1)) {
+						addRow = false;
+					}
+					deduplicator.addJob(fp1);
+				}
+				
+				if (addRow) {
 					writeRowToFile(this.directory + "/" + Integer.toString(rowNumber) + ".json");
 					rowNumber++;
 				}
-				deduplicator.addJob(fp1);
+				
 				currentRow.clear();
 			}
 			
