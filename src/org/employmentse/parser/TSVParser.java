@@ -66,14 +66,16 @@ public class TSVParser extends AbstractParser
             }
             xhtml.endElement("tr");
             
-            char[] bufferCharacters = new char[4096];
+            int bufferSize = 4096;
+            char[] bufferCharacters = new char[bufferSize];
             int n = reader.read(bufferCharacters);
+            
             int bufferBlock=1;                                  
             while (n!=-1) 
-            {                    	
+            {
             	String[] bufferElements = new String(bufferCharacters)
-            	.replaceAll("[\\t]",	"\t"+tablineTag+"\t")
-            	.replaceAll("[\\r\\n]", "\n"+newlineTag+"\n")
+            	.replaceAll("[\\t]",	"|"+tablineTag+"|")
+            	.replaceAll("[\\r\\n]", "|"+newlineTag+"|")
             	.replaceAll("Ã©","é").replaceAll("√©","é")
             	.replaceAll("Ã³","ó").replaceAll("√≥","ó")
             	.replaceAll("Ã¡","á").replaceAll("√°","á")
@@ -84,7 +86,14 @@ public class TSVParser extends AbstractParser
             	.replaceAll("Â´","'").replaceAll("¬¥","'")
             	.replaceAll("Â°","°").replaceAll("¬∞","°")
             	.replaceAll("Ã±","ñ").replaceAll("√±","ñ")
-            	.split("[\\t\\r\\n]+"); 
+            	.split("[|]+"); 
+            	
+            	if 	(n<bufferSize)
+            	{	
+            		int i=bufferElements.length-2;
+            		while ((i>0)&&(bufferElements[i].equals(tablineTag)||bufferElements[i].equals(newlineTag)))
+            		{bufferElements[i]=""; i--;}
+            	}         			
             	
             	if (bufferBlock==1) {xhtml.startElement("tr"); xhtml.startElement("td");}            	            
             	for (int i=0; i<bufferElements.length; i++)          
@@ -100,7 +109,7 @@ public class TSVParser extends AbstractParser
             		else if (nextElement.equals(newlineTag)){xhtml.endElement("td"); xhtml.endElement("tr");}            		
             	}
             	bufferBlock++;            	
-            	bufferCharacters = new char[4096];        		
+            	bufferCharacters = new char[bufferSize];        		
                 n = reader.read(bufferCharacters);
             }            
             xhtml.endElement("td");
