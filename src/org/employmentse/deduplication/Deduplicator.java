@@ -7,7 +7,7 @@ public class Deduplicator {
 
 	private Set<FingerPrint> existingJobs = new HashSet<>();
 
-	public float DUPLICATE_THRESHOLD = (float) 0.8; 
+	public float DUPLICATE_THRESHOLD = (float) 0.7; 
 	
 	public Deduplicator() {
 		
@@ -19,6 +19,8 @@ public class Deduplicator {
 	
 	public boolean isDuplicate(FingerPrint fp1) {
 		for (FingerPrint fp2 : getExistingJobs()) {
+			float x = FingerPrint.getSimilarity(fp1, fp2);
+			System.out.println(x);
 			if (FingerPrint.getSimilarity(fp1, fp2) >= DUPLICATE_THRESHOLD) {
 				return true;
 			}

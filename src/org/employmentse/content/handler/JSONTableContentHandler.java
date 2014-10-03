@@ -102,8 +102,9 @@ public class JSONTableContentHandler extends SafeContentHandler {
 				boolean addRow = true; 
 				
 				if (enableDeduplication) {
-					FingerPrint fp1 = new FingerPrint(currentRow);
+					FingerPrint fp1 = getCurrentRowFingerprint();
 					if (deduplicator.isDuplicate(fp1)) {
+						System.out.println("Found duplicate at row " + rowNumber);
 						addRow = false;
 					}
 					deduplicator.addJob(fp1);
@@ -121,6 +122,18 @@ public class JSONTableContentHandler extends SafeContentHandler {
 		
 	}
 	
+	private FingerPrint getCurrentRowFingerprint() {
+		List<String> fingerprintFields = new ArrayList<>();
+		fingerprintFields.add(currentRow.get(1)); // location
+		fingerprintFields.add(currentRow.get(2)); // department
+		fingerprintFields.add(currentRow.get(3)); // title
+		fingerprintFields.add(currentRow.get(8)); // job type
+		fingerprintFields.add(currentRow.get(10)); // company
+		fingerprintFields.add(currentRow.get(14)); // location?
+		
+		return new FingerPrint(fingerprintFields);
+	}
+
 	private void writeRowToFile(String filename) {
 		Writer writer = null;
 		try {
