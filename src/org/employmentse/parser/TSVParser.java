@@ -70,10 +70,10 @@ public class TSVParser extends AbstractParser
             char[] bufferCharacters = new char[bufferSize];
             int n = reader.read(bufferCharacters);
             
-            int bufferBlock=1;                                  
+            int bufferBlock=1;//first bufferBlock                                
             while (n!=-1) 
             {
-            	String[] bufferElements = new String(bufferCharacters)
+            	String bufferString = new String(bufferCharacters)
             	.replaceAll("[\\t]",	"|"+tablineTag+"|")
             	.replaceAll("[\\r\\n]", "|"+newlineTag+"|")
             	.replaceAll("Ã©","é").replaceAll("√©","é")
@@ -85,15 +85,23 @@ public class TSVParser extends AbstractParser
             	.replaceAll("ÂŽ","'").replaceAll("Ã¤","à")
             	.replaceAll("Â´","'").replaceAll("¬¥","'")
             	.replaceAll("Â°","°").replaceAll("¬∞","°")
-            	.replaceAll("Ã±","ñ").replaceAll("√±","ñ")
-            	.split("[|]+"); 
-            	
-            	if 	(n<bufferSize)
-            	{	
-            		int i=bufferElements.length-2;
-            		while ((i>0)&&(bufferElements[i].equals(tablineTag)||bufferElements[i].equals(newlineTag)))
-            		{bufferElements[i]=""; i--;}
-            	}         			
+            	.replaceAll("Ã±","ñ").replaceAll("√±","ñ");
+            	    	
+            	if 	(n<bufferSize)//last bufferBlock
+            	{	            	
+            		while (bufferString.substring(bufferString.trim().length()-1,bufferString.trim().length()).equals("|")
+            			|| bufferString.substring(bufferString.trim().length()-7,bufferString.trim().length()).equals(tablineTag)
+            			|| bufferString.substring(bufferString.trim().length()-7,bufferString.trim().length()).equals(newlineTag))
+            		{
+            			if (bufferString.substring(bufferString.trim().length()-1,bufferString.trim().length()).equals("|"))
+            			{bufferString=bufferString.substring(0,bufferString.trim().length()-1);}
+            			if (bufferString.substring(bufferString.trim().length()-7,bufferString.trim().length()).equals(tablineTag))
+            			{bufferString=bufferString.substring(0,bufferString.trim().length()-7);}
+            			if (bufferString.substring(bufferString.trim().length()-7,bufferString.trim().length()).equals(newlineTag))
+            			{bufferString=bufferString.substring(0,bufferString.trim().length()-7);}
+            		}
+            	}         			            	
+            	String[] bufferElements = bufferString.split("[|]+"); 
             	
             	if (bufferBlock==1) {xhtml.startElement("tr"); xhtml.startElement("td");}            	            
             	for (int i=0; i<bufferElements.length; i++)          
