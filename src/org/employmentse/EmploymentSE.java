@@ -61,21 +61,21 @@ public class EmploymentSE
 					InputStream input = new FileInputStream(inputFolder+fileEntry.getName());
 									
 //					============================ OUTPUT JSON FILES =============================//  
-					ContentHandler handler = new JSONTableContentHandler(outputFolder, false);
-					Metadata metadata = new Metadata();
-					TSVParser parser = new TSVParser(headers);
-					parser.parse(input, handler, metadata, new ParseContext());
-//					============================================================================//  
-				
-//					============================ OUTPUT XHTML FILE =============================//  		
-//					ContentHandler handler = new ToXMLContentHandler();
+//					ContentHandler handler = new JSONTableContentHandler(outputFolder, false);
 //					Metadata metadata = new Metadata();
 //					TSVParser parser = new TSVParser(headers);
 //					parser.parse(input, handler, metadata, new ParseContext());
-//
-//					PrintWriter writer = new PrintWriter(outputFolder+fileName+".xhtml","UTF-8");
-//					writer.println(handler.toString()); 
-//					writer.close();					
+//					============================================================================//  
+				
+//					============================ OUTPUT XHTML FILE =============================//  		
+					ContentHandler handler = new ToXMLContentHandler();
+					Metadata metadata = new Metadata();
+					TSVParser parser = new TSVParser(headers);
+					parser.parse(input, handler, metadata, new ParseContext());
+
+					PrintWriter writer = new PrintWriter(outputFolder+fileName+".xhtml","UTF-8");
+					writer.println(handler.toString()); 
+					writer.close();					
 //					============================================================================//
 					System.out.println(fileEntry.getName()+ ":\t done");
 				}	
