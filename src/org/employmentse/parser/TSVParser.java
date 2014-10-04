@@ -70,7 +70,7 @@ public class TSVParser extends AbstractParser
             char[] bufferCharacters = new char[bufferSize];
             int n = reader.read(bufferCharacters);
             
-            int bufferBlock=1;//first bufferBlock                                
+            int bufferBlock=1;                               
             while (n!=-1) 
             {
             	String bufferString = new String(bufferCharacters)
@@ -87,7 +87,7 @@ public class TSVParser extends AbstractParser
             	.replaceAll("Â°","°").replaceAll("¬∞","°")
             	.replaceAll("Ã±","ñ").replaceAll("√±","ñ");
             	    	
-            	if 	(n<bufferSize)//last bufferBlock
+            	if 	(n<bufferSize) //last bufferBlock
             	{	            	
             		while (bufferString.substring(bufferString.trim().length()-1,bufferString.trim().length()).equals("|")
             			|| bufferString.substring(bufferString.trim().length()-7,bufferString.trim().length()).equals(tablineTag)
@@ -101,9 +101,11 @@ public class TSVParser extends AbstractParser
             			{bufferString=bufferString.substring(0,bufferString.trim().length()-7);}
             		}
             	}         			            	
-            	String[] bufferElements = bufferString.split("[|]+"); 
+            	             	
+            	if (bufferBlock==1) //first bufferBlock 
+            	{xhtml.startElement("tr"); xhtml.startElement("td");}
+            	String[] bufferElements = bufferString.split("[|]+");
             	
-            	if (bufferBlock==1) {xhtml.startElement("tr"); xhtml.startElement("td");}            	            
             	for (int i=0; i<bufferElements.length; i++)          
             	{            		            	
             		String currElement = bufferElements[i];

@@ -1,7 +1,9 @@
 package org.employmentse.content.handler;
 
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileOutputStream;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
@@ -41,11 +43,29 @@ public class JSONTableContentHandler extends SafeContentHandler {
 	private final Deduplicator deduplicator = new Deduplicator(); 
 	private boolean enableDeduplication = false;
 	
-	public JSONTableContentHandler(String directory, boolean enableDeduplication) {
+	public JSONTableContentHandler(String directory, boolean enableDeduplication) 
+	{
 		super(new DefaultHandler());
 		
 		this.directory = directory;
 		this.enableDeduplication = enableDeduplication;
+		
+		File[] fileArray = new File(directory).listFiles(new FilenameFilter() 
+		{
+		    public boolean accept(File dir, String name) 
+		    {return name.toLowerCase().endsWith(".json");}		    
+		});
+												
+		if (fileArray.length!=0) 
+		{		
+			String lastFileName = fileArray[0].getName().substring(0, fileArray[0].getName().indexOf(".",-1));			
+			for (int i=1; i<fileArray.length; i++) 
+			{
+				String currentFileName = fileArray[i].getName().substring(0, fileArray[i].getName().indexOf(".",-1));	
+				if (Integer.parseInt(lastFileName) < Integer.parseInt(currentFileName)) {lastFileName=currentFileName;}
+			}
+			rowNumber=Integer.parseInt(lastFileName)+1;
+		}	
 	}
 	
 	@Override
@@ -87,24 +107,27 @@ public class JSONTableContentHandler extends SafeContentHandler {
 			headers.add(cellvalue);
 		} else if(currentElement.equals(TD)) {
 			currentRow.add(cellvalue);
+			cellvalue="";
 		}
 		
-		if (localName.equals(TR) && documentPosition == DocumentPosition.CONTENT) {
-			
-			if (currentRow.size() != headers.size()) {
-				
-				System.err.println("A row didn't fill up to the proper size!!");
-				System.err.println("size = " + currentRow.size() + " instead of " + headers.size());
-				System.err.println("headers = " + headers);
-				System.err.println("currentRow = " + currentRow);
-				System.exit(1);
-			} else {
+		if (localName.equals(TR) && documentPosition == DocumentPosition.CONTENT) 
+		{
+			if (currentRow.size() < headers.size())
+			{
+				while (currentRow.size() < headers.size()) {currentRow.add(cellvalue);}
+//				System.err.println("A row didn't fill up to the proper size!!");
+//				System.err.println("size = " + currentRow.size() + " instead of " + headers.size());
+//				System.err.println("headers = " + headers);
+//				System.err.println("currentRow = " + currentRow);
+//				System.exit(1);
+			}
+//			else 
+			{
 				boolean addRow = true; 
 				
 				if (enableDeduplication) {
-					FingerPrint fp1 = getCurrentRowFingerprint();
+					FingerPrint fp1 = new FingerPrint(currentRow);
 					if (deduplicator.isDuplicate(fp1)) {
-						System.out.println("Found duplicate at row " + rowNumber);
 						addRow = false;
 					}
 					deduplicator.addJob(fp1);
@@ -122,18 +145,6 @@ public class JSONTableContentHandler extends SafeContentHandler {
 		
 	}
 	
-	private FingerPrint getCurrentRowFingerprint() {
-		List<String> fingerprintFields = new ArrayList<>();
-		fingerprintFields.add(currentRow.get(1)); // location
-		fingerprintFields.add(currentRow.get(2)); // department
-		fingerprintFields.add(currentRow.get(3)); // title
-		fingerprintFields.add(currentRow.get(8)); // job type
-		fingerprintFields.add(currentRow.get(10)); // company
-		fingerprintFields.add(currentRow.get(14)); // location?
-		
-		return new FingerPrint(fingerprintFields);
-	}
-
 	private void writeRowToFile(String filename) {
 		Writer writer = null;
 		try {
