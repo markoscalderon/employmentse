@@ -1,0 +1,27 @@
+apply plugin: 'java'
+apply plugin:'application'
+apply plugin: 'eclipse'
+
+version = '1.0'
+
+mainClassName = "org.employmentse.EmploymentSE"
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile group: 'org.apache.tika', name: 'tika-app', version: '1.6'
+}
+
+jar {
+    manifest {
+        attributes 'Implementation-Title': 'Employment Search Engine',
+                   'Implementation-Version': version,
+                   'Main-Class': 'org.employmentse.EmploymentSE'
+    }
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '2.0'
+}

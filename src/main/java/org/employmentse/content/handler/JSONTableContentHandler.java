@@ -7,6 +7,7 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,25 +39,25 @@ public class JSONTableContentHandler extends SafeContentHandler {
 	private List<String> currentRow = new ArrayList<String>(); 
 	private String cellvalue = "";
 	
-	private final String directory;
+	private final String output;
 	
 	private final Deduplicator deduplicator = new Deduplicator(); 
 	private boolean enableDeduplication = false;
 	
-	public JSONTableContentHandler(String directory, boolean enableDeduplication) 
+	public JSONTableContentHandler(String output, boolean enableDeduplication) throws URISyntaxException 
 	{
 		super(new DefaultHandler());
 		
-		this.directory = directory;
+		this.output = output;
 		this.enableDeduplication = enableDeduplication;
 		
-		File[] fileArray = new File(directory).listFiles(new FilenameFilter() 
+		File[] fileArray = new File(this.output).listFiles(new FilenameFilter() 
 		{
 		    public boolean accept(File dir, String name) 
 		    {return name.toLowerCase().endsWith(".json");}		    
 		});
 												
-		if (fileArray.length!=0) 
+		if (fileArray.length != 0) 
 		{		
 			String lastFileName = fileArray[0].getName().substring(0, fileArray[0].getName().indexOf(".",-1));			
 			for (int i=1; i<fileArray.length; i++) 
@@ -134,7 +135,7 @@ public class JSONTableContentHandler extends SafeContentHandler {
 				}
 				
 				if (addRow) {
-					writeRowToFile(this.directory + "/" + Integer.toString(rowNumber) + ".json");
+					writeRowToFile(this.output + Integer.toString(rowNumber) + ".json");
 					rowNumber++;
 				}
 				

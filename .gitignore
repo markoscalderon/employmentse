@@ -1,5 +1,6 @@
-lib/tika-app-1.6.jar
-assets/output
+.DS_Store
+build
+output
 .classpath
 .project
 *.pydevproject

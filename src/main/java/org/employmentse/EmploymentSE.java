@@ -4,12 +4,11 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.PrintWriter;
+import java.net.URISyntaxException;
 
 import org.apache.tika.exception.TikaException;
 import org.apache.tika.metadata.Metadata;
 import org.apache.tika.parser.ParseContext;
-import org.apache.tika.sax.ToXMLContentHandler;
 import org.employmentse.content.handler.JSONTableContentHandler;
 import org.employmentse.parser.TSVParser;
 import org.xml.sax.ContentHandler;
@@ -17,10 +16,10 @@ import org.xml.sax.SAXException;
 
 public class EmploymentSE 
 {
-	public static String inputFolder  = "assets/";
-	public static String outputFolder = "assets/output/";
+	public static String datasetFolder  = "assets/";
+	public static String outputFolder = "output/";
 	
-	public static void main(String[] args) throws IOException, SAXException, TikaException 
+	public static void main(String[] args) throws IOException, SAXException, TikaException, URISyntaxException 
 	{
 		String[] headers = {
 							"Posted Date",
@@ -44,11 +43,25 @@ public class EmploymentSE
 							"URL",
 							"Last Seen Date"
 							};
+				
+		File directory = new File(datasetFolder);
 		
-		final File folder = new File(inputFolder);
+		if (!directory.exists()) {
+			System.err.println("Please create a folder called 'assets' and put your *.tsv files");
+			System.exit(-1);
+		}
+		
+		directory = new File(outputFolder);
+		
+		if (!directory.exists()) {
+			directory.mkdir();
+		}
+
 		long startTime = System.currentTimeMillis();
+
+		File dataset = new File(datasetFolder);;
 		
-		for (final File fileEntry : folder.listFiles()) 
+		for (final File fileEntry : dataset.listFiles()) 
 		{			
 			if (!fileEntry.isDirectory())
 			{
@@ -56,8 +69,8 @@ public class EmploymentSE
 				String fileName = fileEntry.getName().substring(0, fileEntry.getName().indexOf(".",-1));
 				
 				if (!fileName.equals("") && fileType.equals(".tsv"))
-				{						
-					InputStream input = new FileInputStream(inputFolder+fileEntry.getName());
+				{
+					InputStream input = new FileInputStream(datasetFolder + fileEntry.getName());
 									
 //					============================ OUTPUT JSON FILES =============================//  
 					ContentHandler handler = new JSONTableContentHandler(outputFolder, false);
