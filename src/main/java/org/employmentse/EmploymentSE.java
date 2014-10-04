@@ -72,8 +72,11 @@ public class EmploymentSE
 				{
 					InputStream input = new FileInputStream(datasetFolder + fileEntry.getName());
 									
-//					============================ OUTPUT JSON FILES =============================//  
-					ContentHandler handler = new JSONTableContentHandler(outputFolder, false);
+//					============================ OUTPUT JSON FILES =============================//
+					directory = new File(outputFolder + fileName + "/");
+					if (!directory.exists()) directory.mkdir();
+					
+					ContentHandler handler = new JSONTableContentHandler(outputFolder + fileName + "/", false);
 					Metadata metadata = new Metadata();
 					TSVParser parser = new TSVParser(headers);
 					parser.parse(input, handler, metadata, new ParseContext());

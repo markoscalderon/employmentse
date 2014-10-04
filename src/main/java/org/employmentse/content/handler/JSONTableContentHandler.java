@@ -115,32 +115,26 @@ public class JSONTableContentHandler extends SafeContentHandler {
 		{
 			if (currentRow.size() < headers.size())
 			{
-				while (currentRow.size() < headers.size()) {currentRow.add(cellvalue);}
-//				System.err.println("A row didn't fill up to the proper size!!");
-//				System.err.println("size = " + currentRow.size() + " instead of " + headers.size());
-//				System.err.println("headers = " + headers);
-//				System.err.println("currentRow = " + currentRow);
-//				System.exit(1);
-			}
-//			else 
-			{
-				boolean addRow = true; 
-				
-				if (enableDeduplication) {
-					FingerPrint fp1 = new FingerPrint(currentRow);
-					if (deduplicator.isDuplicate(fp1)) {
-						addRow = false;
-					}
-					deduplicator.addJob(fp1);
+				while (currentRow.size() < headers.size()) {
+					currentRow.add(cellvalue);
 				}
-				
-				if (addRow) {
-					writeRowToFile(this.output + Integer.toString(rowNumber) + ".json");
-					rowNumber++;
-				}
-				
-				currentRow.clear();
 			}
+			boolean addRow = true; 
+			
+			if (enableDeduplication) {
+				FingerPrint fp1 = new FingerPrint(currentRow);
+				if (deduplicator.isDuplicate(fp1)) {
+					addRow = false;
+				}
+				deduplicator.addJob(fp1);
+			}
+			
+			if (addRow) {
+				writeRowToFile(this.output + Integer.toString(rowNumber) + ".json");
+				rowNumber++;
+			}
+			
+			currentRow.clear();
 			
 		}
 		
