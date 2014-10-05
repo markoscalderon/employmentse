@@ -86,19 +86,14 @@ public class TSVParser extends AbstractParser
             	.replaceAll("Â´","'").replaceAll("¬¥","'")
             	.replaceAll("Â°","°").replaceAll("¬∞","°")
             	.replaceAll("Ã±","ñ").replaceAll("√±","ñ");
-            	    	
+
             	if 	(n<bufferSize) //last bufferBlock
             	{	            	
-            		while (bufferString.substring(bufferString.trim().length()-1,bufferString.trim().length()).equals("|")
-            			|| bufferString.substring(bufferString.trim().length()-7,bufferString.trim().length()).equals(tablineTag)
-            			|| bufferString.substring(bufferString.trim().length()-7,bufferString.trim().length()).equals(newlineTag))
+            		while (bufferString.trim().endsWith("|") || bufferString.trim().endsWith(tablineTag) || bufferString.trim().endsWith(newlineTag))
             		{
-            			if (bufferString.substring(bufferString.trim().length()-1,bufferString.trim().length()).equals("|"))
-            			{bufferString=bufferString.substring(0,bufferString.trim().length()-1);}
-            			if (bufferString.substring(bufferString.trim().length()-7,bufferString.trim().length()).equals(tablineTag))
-            			{bufferString=bufferString.substring(0,bufferString.trim().length()-7);}
-            			if (bufferString.substring(bufferString.trim().length()-7,bufferString.trim().length()).equals(newlineTag))
-            			{bufferString=bufferString.substring(0,bufferString.trim().length()-7);}
+            			if (bufferString.trim().endsWith("|"))        {bufferString=bufferString.substring(0,bufferString.trim().length()-1);}
+            			if (bufferString.trim().endsWith(tablineTag)) {bufferString=bufferString.substring(0,bufferString.trim().lastIndexOf(tablineTag));}
+            			if (bufferString.trim().endsWith(newlineTag)) {bufferString=bufferString.substring(0,bufferString.trim().lastIndexOf(newlineTag));}
             		}
             	}         			            	
             	             	
@@ -127,7 +122,7 @@ public class TSVParser extends AbstractParser
             xhtml.endElement("table");
             xhtml.endDocument();            
         }        
-        catch (Exception e){e.printStackTrace();}		       
+        catch (Exception e){e.printStackTrace();} 
         finally {reader.close();}        
     }
 }

@@ -4,19 +4,22 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PrintWriter;
 import java.net.URISyntaxException;
 
 import org.apache.tika.exception.TikaException;
 import org.apache.tika.metadata.Metadata;
 import org.apache.tika.parser.ParseContext;
+import org.apache.tika.sax.ToXMLContentHandler;
 import org.employmentse.content.handler.JSONTableContentHandler;
 import org.employmentse.parser.TSVParser;
+import org.employmentse.splitter.JSONSplitter;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 
 public class EmploymentSE 
 {
-	public static String datasetFolder  = "assets/";
+	public static String inputFolder  = "assets/";
 	public static String outputFolder = "output/";
 	
 	public static void main(String[] args) throws IOException, SAXException, TikaException, URISyntaxException 
@@ -44,22 +47,25 @@ public class EmploymentSE
 							"Last Seen Date"
 							};
 				
-		File directory = new File(datasetFolder);
+		File directory = new File(inputFolder);
 		
-		if (!directory.exists()) {
+		if (!directory.exists()) 
+		{
 			System.err.println("Please create a folder called 'assets' and put your *.tsv files");
 			System.exit(-1);
 		}
 		
 		directory = new File(outputFolder);
 		
-		if (!directory.exists()) {
+		if (!directory.exists()) 
+		{
 			directory.mkdir();
 		}
 
 		long startTime = System.currentTimeMillis();
 
-		File dataset = new File(datasetFolder);;
+		File dataset = new File(inputFolder);
+		int counter = 1;
 		
 		for (final File fileEntry : dataset.listFiles()) 
 		{			
@@ -68,33 +74,52 @@ public class EmploymentSE
 				String fileType = fileEntry.getName().substring(fileEntry.getName().indexOf(".",-1),fileEntry.getName().length());
 				String fileName = fileEntry.getName().substring(0, fileEntry.getName().indexOf(".",-1));
 				
+//				===================== CONVERT TSV TO MULTIPLE JSON FILES ===================//
 				if (!fileName.equals("") && fileType.equals(".tsv"))
 				{
-					InputStream input = new FileInputStream(datasetFolder + fileEntry.getName());
+					InputStream input = new FileInputStream(inputFolder + fileEntry.getName());
 									
 //					============================ OUTPUT JSON FILES =============================//
 					directory = new File(outputFolder + fileName + "/");
 					if (!directory.exists()) directory.mkdir();
 					
-					ContentHandler handler = new JSONTableContentHandler(outputFolder, fileName, false);
 					//ContentHandler handler = new JSONTableContentHandler(outputFolder, false);
+					ContentHandler handler = new JSONTableContentHandler(outputFolder + fileName + "/", false);
+
 					Metadata metadata = new Metadata();
 					TSVParser parser = new TSVParser(headers);
 					parser.parse(input, handler, metadata, new ParseContext());
-//					============================================================================//  
+					System.out.println(String.valueOf(counter)+". "+fileEntry.getName()+ ":\t done");
+					counter++;
+				}
+//				============================================================================//
 				
-//					============================ OUTPUT XHTML FILE =============================//  		
+//				========================== CONVERT TSV TO XHTML FILE =======================//
+//				if (!fileName.equals("") && fileType.equals(".tsv"))
+//				{
+//					InputStream input = new FileInputStream(inputFolder + fileEntry.getName());
 //					ContentHandler handler = new ToXMLContentHandler();
 //					Metadata metadata = new Metadata();
 //					TSVParser parser = new TSVParser(headers);
 //					parser.parse(input, handler, metadata, new ParseContext());
 //
 //					PrintWriter writer = new PrintWriter(outputFolder+fileName+".xhtml","UTF-8");
-//					writer.println(handler.toString()); 
-//					writer.close();					
-//					============================================================================//
-					System.out.println(fileEntry.getName()+ ":\t done");
-				}	
+//					writer.println(handler.toString());
+//					writer.close();	
+//					System.out.println(String.valueOf(counter)+". "+fileEntry.getName()+ ":\t done");
+//					counter++;
+//				}
+//				============================================================================//
+				
+//				======================== SPLIT JSON TO MULTIPLE JSON FILES =================//
+//				if (!fileName.equals("") && fileType.equals(".json"))
+//				{
+//					JSONSplitter splitter = new JSONSplitter();
+//					splitter.SplitSourceFile(inputFolder+fileEntry.getName(), outputFolder);
+//					System.out.println(String.valueOf(counter)+". "+fileEntry.getName()+ ":\t done");
+//					counter++;				
+//				}
+//				============================================================================//
 			}
 		}		
 		long finishTime = System.currentTimeMillis();
@@ -110,6 +135,6 @@ public class EmploymentSE
 		String SS = String.valueOf(ss); if (ss<10){SS="0"+SS;}
 		String MS = String.valueOf(ms); if (ms<10){MS="0"+MS;}
 		
-		System.out.println("\nJob parsing completed\nProcessing time: "+HH+":"+MM+":"+SS+"."+MS);
+		System.out.println("\nParsing completed\nProcessing time: "+HH+":"+MM+":"+SS+"."+MS);
 	}
 }

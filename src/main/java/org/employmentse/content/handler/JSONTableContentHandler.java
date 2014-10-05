@@ -52,14 +52,14 @@ public class JSONTableContentHandler extends SafeContentHandler {
 	private boolean enableDeduplication = false;
 	
 	Jedis redis;
-	String filename;
 	
-	public JSONTableContentHandler(String baseDir, String filename, boolean enableDeduplication) throws URISyntaxException 
+	public JSONTableContentHandler(String output, boolean enableDeduplication) throws URISyntaxException 
 	{
 		super(new DefaultHandler());
+		
 		redis = new Jedis("localhost");
-		this.filename = filename;
-		this.output = baseDir + filename + "/";
+		
+		this.output = output;
 		this.enableDeduplication = enableDeduplication;
 		
 		File[] fileArray = new File(this.output).listFiles(new FilenameFilter() 
@@ -155,15 +155,16 @@ public class JSONTableContentHandler extends SafeContentHandler {
 			if (addRow) {
 				writeRowToFile(this.output + Integer.toString(rowNumber) + ".json");
 				
-				//String key = "jobs:" + filename + ":" + rowNumber;
-				//redis.set(key, getJSONString());
-				//redis.incr("jobs:total");
+//				String filename = this.output.replaceFirst(".*/([^/?]+).*", "$1");
+//				String key = "jobs:" + filename + ":" + rowNumber;
+//				redis.set(key, getJSONString());
+//				redis.incr("jobs:total");
 				
 				rowNumber++;
 			} else {
-				//String key = "duplicates:" + filename;
-				//redis.rpush(key, getJSONString());
-				//redis.incr("duplicates:total");
+//				String key = "duplicates:" + filename;
+//				redis.rpush(key, getJSONString());
+//				redis.incr("duplicates:total");
 			}
 			
 			currentRow.clear();
