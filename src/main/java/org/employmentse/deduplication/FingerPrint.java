@@ -1,11 +1,22 @@
 package org.employmentse.deduplication;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class FingerPrint {
+public class FingerPrint implements Serializable {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 526745526873904169L;
 
 	private static int titleIDX = 2; 
 	
@@ -46,5 +57,16 @@ public class FingerPrint {
 		return (float) intersection.size() / (float) union.size();
 	}
 	
-	
+	public static byte[] serialize(FingerPrint fp) throws IOException {
+	    ByteArrayOutputStream out = new ByteArrayOutputStream();
+	    ObjectOutputStream os = new ObjectOutputStream(out);
+	    os.writeObject(fp);
+	    return out.toByteArray();
+	}
+
+	public static FingerPrint deserialize(byte[] data) throws IOException, ClassNotFoundException {
+	    ByteArrayInputStream in = new ByteArrayInputStream(data);
+	    ObjectInputStream is = new ObjectInputStream(in);
+	    return (FingerPrint) is.readObject();
+	}
 }
