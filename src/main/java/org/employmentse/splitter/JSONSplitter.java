@@ -77,8 +77,8 @@ public class JSONSplitter
 							FingerPrint fpValue = new FingerPrint(getKeyFields());
 							elementList.clear();
 						
-							if (deduplicator.isDuplicate(fpValue)) {addRow = false;}							
-							deduplicator.addJob(fpValue);
+							if (deduplicator.isDuplicate(fpValue.toString())) {addRow = false;}							
+							deduplicator.addJob(fpValue.toString());
 						}					
 						if (addRow) {CreateJSONFile(element, this.output);}						
 					} 

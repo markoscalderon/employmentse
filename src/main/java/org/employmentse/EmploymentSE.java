@@ -78,14 +78,11 @@ public class EmploymentSE
 				if (!fileName.equals("") && fileType.equals(".tsv"))
 				{
 					InputStream input = new FileInputStream(inputFolder + fileEntry.getName());
-									
-//					============================ OUTPUT JSON FILES =============================//
-					directory = new File(outputFolder + fileName + "/");
-					if (!directory.exists()) directory.mkdir();
+					//directory = new File(outputFolder + fileName + "/");
+					//if (!directory.exists()) directory.mkdir();					
+					//ContentHandler handler = new JSONTableContentHandler(outputFolder + fileName + "/", false);
 					
-					//ContentHandler handler = new JSONTableContentHandler(outputFolder, false);
-					ContentHandler handler = new JSONTableContentHandler(outputFolder + fileName + "/", false);
-
+					ContentHandler handler = new JSONTableContentHandler(outputFolder, false);
 					Metadata metadata = new Metadata();
 					TSVParser parser = new TSVParser(headers);
 					parser.parse(input, handler, metadata, new ParseContext());
@@ -115,7 +112,12 @@ public class EmploymentSE
 //				if (!fileName.equals("") && fileType.equals(".json"))
 //				{
 //					JSONSplitter splitter = new JSONSplitter();
-//					splitter.SplitSourceFile(inputFolder+fileEntry.getName(), outputFolder);
+//					splitter.SplitSourceFile(inputFolder+fileEntry.getName(), outputFolder, false);
+//					
+//					//try {if(!new File(inputFolder+fileEntry.getName()).delete())
+//					//{System.out.println(inputFolder+fileEntry.getName()+" delete failed");}}					
+//					//catch (Exception e){e.printStackTrace();}
+//					
 //					System.out.println(String.valueOf(counter)+". "+fileEntry.getName()+ ":\t done");
 //					counter++;				
 //				}
