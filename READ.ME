@@ -48,6 +48,7 @@ Finally, please create a folder called "assets" on the root of the project and p
 On Unix: ./gradlew run -Dexec.args="-program tsv -deduplication off"
 On Mac: gradlew.bat run -Dexec.args="-program tsv -deduplication off"
 
+You should see a new folder called "output" with the individual json files
 
 
 Using ETLlib 
@@ -66,3 +67,5 @@ sh crawler.sh -d assets
 This will generated a json file containing all the rows per each tsv file. Then, we need to generate the individual json files, do:
 On Unix: ./gradlew run -Dexec.args="-program json -deduplication off"
 On Mac: gradlew.bat run -Dexec.args="-program json -deduplication off"
+
+You should see a new folder called "output" with the individual json files

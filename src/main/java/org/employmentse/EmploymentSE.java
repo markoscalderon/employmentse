@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.PrintWriter;
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
@@ -13,14 +12,11 @@ import java.util.List;
 import org.apache.tika.exception.TikaException;
 import org.apache.tika.metadata.Metadata;
 import org.apache.tika.parser.ParseContext;
-import org.apache.tika.sax.ToXMLContentHandler;
 import org.employmentse.content.handler.JSONTableContentHandler;
 import org.employmentse.parser.TSVParser;
 import org.employmentse.splitter.JSONSplitter;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
-
-import redis.clients.jedis.Jedis;
 
 public class EmploymentSE 
 {
@@ -100,7 +96,6 @@ public class EmploymentSE
 
 		File dataset = new File(inputFolder);
 		int counter = 1;
-//		Jedis redis = new Jedis("localhost");
 
 		int JSONcounter = 0;
 		
@@ -148,7 +143,7 @@ public class EmploymentSE
 //				//==========================================================================//								
 			}
 		}	
-//		redis.close();
+		
 		long finishTime = System.currentTimeMillis();
 		long elapsedTime = finishTime-startTime;
 

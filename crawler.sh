@@ -35,7 +35,8 @@ printf "Processing, please wait...\n\n"
 for filename in $2/*.tsv
 do
     count=$((count+1))
-    jsonfile=${filename:6:24}
+    outfilename=$(basename "$filename")
+    jsonfile="${outfilename%.*}"
     /Users/liferayhr/Documents/repositories/etllib/bin/tsvtojson -t $filename -j etllib-json-files/$jsonfile.json -c colheaders.txt -o employment -e encoding.txt
     echo "$count : $jsonfile created."
 done

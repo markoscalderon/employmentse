@@ -12,7 +12,7 @@ Company
 Contact Person
 Phone Number
 Fax Number
-Location
+Location2
 Latitude
 Longitude
 First Seen Date
