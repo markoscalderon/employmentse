@@ -8,11 +8,41 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.employmentse.deduplication.Deduplicator;
+import org.employmentse.deduplication.FingerPrint;
 
 public class JSONSplitter 
 {
-	public void SplitSourceFile(String inputPath, String outputPath) throws IOException
+	private String output;	 
+	private boolean enableDeduplication = false;
+	private final Deduplicator deduplicator = new Deduplicator();
+	private List<String> elementList = new ArrayList<String>(); 
+	
+	private List<String> getKeyFields() 
 	{
+		List<String> features = new ArrayList<String>();
+		
+		features.add(elementList.get(1));
+		features.add(elementList.get(2));
+		features.add(elementList.get(3));
+		features.add(elementList.get(7));
+		features.add(elementList.get(8));
+		features.add(elementList.get(10));
+		features.add(elementList.get(11));
+		features.add(elementList.get(12));
+		features.add(elementList.get(14));
+		
+		return features;
+	}
+	
+	public void SplitSourceFile(String inputPath, String outputPath, Boolean enableDeduplication) throws IOException
+	{		
+		this.output = outputPath;
+		this.enableDeduplication = enableDeduplication;
+				
 		BufferedReader reader = new BufferedReader(new FileReader(inputPath));	
 		try 
         {
@@ -32,10 +62,27 @@ public class JSONSplitter
 				bufferString = lastElement + bufferString;
 				String[] bufferElements = bufferString.split("[|]+");
 				
-				for (String element : bufferElements)			
-				if (element.split("\", \"").length != numberOfColumns-1) {lastElement = element;}
-				else{CreateJSONFile(element, outputPath);} 
-				
+				for (String element : bufferElements)	
+				{	
+					String items[] = element.split("\", \"");
+					if (items.length != numberOfColumns-1) {lastElement = element;}					
+					else
+					{
+						boolean addRow = true; 
+					
+						if (enableDeduplication) 
+						{	
+							for (int i=0; i<items.length; i++)
+							elementList.add(items[i]);
+							FingerPrint fpValue = new FingerPrint(getKeyFields());
+							elementList.clear();
+						
+							if (deduplicator.isDuplicate(fpValue.toString())) {addRow = false;}							
+							deduplicator.addJob(fpValue.toString());
+						}					
+						if (addRow) {CreateJSONFile(element, this.output);}						
+					} 
+				}				
 				bufferCharacters = new char[bufferSize];        		
 				n = reader.read(bufferCharacters);
 			}

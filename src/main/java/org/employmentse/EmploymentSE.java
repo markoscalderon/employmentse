@@ -117,7 +117,12 @@ public class EmploymentSE
 //				if (!fileName.equals("") && fileType.equals(".json"))
 //				{
 //					JSONSplitter splitter = new JSONSplitter();
-//					splitter.SplitSourceFile(inputFolder+fileEntry.getName(), outputFolder);
+//					splitter.SplitSourceFile(inputFolder+fileEntry.getName(), outputFolder, false);
+//					
+//					//try {if(!new File(inputFolder+fileEntry.getName()).delete())
+//					//{System.out.println(inputFolder+fileEntry.getName()+" delete failed");}}					
+//					//catch (Exception e){e.printStackTrace();}
+//					
 //					System.out.println(String.valueOf(counter)+". "+fileEntry.getName()+ ":\t done");
 //					counter++;				
 //				}
