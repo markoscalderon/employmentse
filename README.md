@@ -1,8 +1,8 @@
-# EmploymentSE (TikaParser + JSONTableContentHandler)
-  ===================================================
+EmploymentSE (TikaParser + JSONTableContentHandler)
+===================================================
 
-## Overview
-   --------
+Overview
+--------
 
 The EmploymentSE program is composed on 4 main components:
 
@@ -27,8 +27,8 @@ Class: EmploymentSE
 Description: the main program that read tsv files from a 'assets' directory and put the results in a directory called 'ouput'
 
 
-## Installation
-   ------------
+Installation
+------------
 
 1. Install Redis if Deduplication is enabled. Deduplication is disabled by default. 
 
@@ -36,8 +36,8 @@ Description: the main program that read tsv files from a 'assets' directory and 
 On Unix: ./gradlew build
 On Mac: gradlew.bat build
 
-## Running
-   -------
+Running
+-------
 
 Finally, please create a folder called "assets" on the root of the project and put your tsv files. Then, sit back, get a coffee, and do:
 On Unix: ./gradlew run -Dexec.args="-program tsv -deduplication off"
@@ -46,8 +46,8 @@ On Mac: gradlew.bat run -Dexec.args="-program tsv -deduplication off"
 You should see a new folder called "output" with the individual json files
 
 
-## Using ETLlib 
-   ------------
+Using ETLlib 
+------------
 
 ETLlib is a set of tools that enables data extraction. One of those tool is tsvtojson which extracts the contents of tsv files and creates json files. You can read more about it on: https://github.com/chrismattmann/etllib
 
@@ -66,8 +66,8 @@ On Mac: gradlew.bat run -Dexec.args="-program json -deduplication off"
 You should see a new folder called "output" with the individual json files
 
 
-## Authors
-   -------
+Authors
+-------
 Johnson Hsieh
 Imran Mammadli
 Marco Calderon
