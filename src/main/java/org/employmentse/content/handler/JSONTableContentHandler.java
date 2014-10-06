@@ -9,7 +9,9 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.tika.sax.SafeContentHandler;
 import org.employmentse.deduplication.Deduplicator;
@@ -17,6 +19,11 @@ import org.employmentse.deduplication.FingerPrint;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
+import redis.clients.jedis.Jedis;
 
 public class JSONTableContentHandler extends SafeContentHandler {
 
@@ -44,9 +51,13 @@ public class JSONTableContentHandler extends SafeContentHandler {
 	private final Deduplicator deduplicator = new Deduplicator(); 
 	private boolean enableDeduplication = false;
 	
+	Jedis redis;
+	
 	public JSONTableContentHandler(String output, boolean enableDeduplication) throws URISyntaxException 
 	{
 		super(new DefaultHandler());
+		
+		redis = new Jedis("localhost");
 		
 		this.output = output;
 		this.enableDeduplication = enableDeduplication;
@@ -66,7 +77,7 @@ public class JSONTableContentHandler extends SafeContentHandler {
 				if (Integer.parseInt(lastFileName) < Integer.parseInt(currentFileName)) {lastFileName=currentFileName;}
 			}
 			rowNumber=Integer.parseInt(lastFileName)+1;
-		}	
+		}
 	}
 	
 	@Override
@@ -122,16 +133,38 @@ public class JSONTableContentHandler extends SafeContentHandler {
 			boolean addRow = true; 
 			
 			if (enableDeduplication) {
-				FingerPrint fp1 = new FingerPrint(currentRow);
-				if (deduplicator.isDuplicate(fp1)) {
-					addRow = false;
+				
+				addRow = false;
+				
+				List<String> features = getFeatures();
+				String featuresHashCode = Integer.toString(features.hashCode());
+				
+				if (!deduplicator.isDuplicate(featuresHashCode)) {
+					FingerPrint fp1 = new FingerPrint(features);
+					if (!deduplicator.isNearDuplicate(currentRow.get(10), fp1)) {
+						addRow = true;
+						
+						deduplicator.addFingerPrint(currentRow.get(10), fp1);
+					}
+					
+					deduplicator.addJob(featuresHashCode);
 				}
-				deduplicator.addJob(fp1);
+				
 			}
 			
 			if (addRow) {
 				writeRowToFile(this.output + Integer.toString(rowNumber) + ".json");
+				
+//				String filename = this.output.replaceFirst(".*/([^/?]+).*", "$1");
+//				String key = "jobs:" + filename + ":" + rowNumber;
+//				redis.set(key, getJSONString());
+//				redis.incr("jobs:total");
+				
 				rowNumber++;
+			} else {
+//				String key = "duplicates:" + filename;
+//				redis.rpush(key, getJSONString());
+//				redis.incr("duplicates:total");
 			}
 			
 			currentRow.clear();
@@ -140,24 +173,47 @@ public class JSONTableContentHandler extends SafeContentHandler {
 		
 	}
 	
+	@Override
+	public void endDocument() throws SAXException {
+		redis.close();
+	}
+	
+	private List<String> getFeatures() {
+		List<String> features = new ArrayList<String>();
+		
+		features.add(currentRow.get(1));
+		features.add(currentRow.get(2));
+		features.add(currentRow.get(3));
+		features.add(currentRow.get(7));
+		features.add(currentRow.get(8));
+		features.add(currentRow.get(10));
+		features.add(currentRow.get(11));
+		features.add(currentRow.get(12));
+		features.add(currentRow.get(14));
+		
+		return features;
+	}
+	
+	private String getJSONString() {
+		Map<String, Object> map = new HashMap<String, Object>();
+		
+		for (int i = 0; i < headers.size()-1; i++) {
+			map.put(headers.get(i), currentRow.get(i));
+		}
+		
+		Gson gson = new GsonBuilder().setPrettyPrinting().create();
+		
+		return gson.toJson(map);
+	}
+
 	private void writeRowToFile(String filename) {
 		Writer writer = null;
 		try {
 		    writer = new BufferedWriter(new OutputStreamWriter(
 		          new FileOutputStream(filename), "utf-8"));
 		    
-		    writer.write("{\n");
-			for (int i = 0; i < headers.size()-1; i++) {
-				//write to json parellel-y
-				String jsonRow = "\""+headers.get(i) + "\": \"" + currentRow.get(i)+"\"";
-				if (i != headers.size()-2) {
-					jsonRow += ", ";
-				}
-					
-				writer.write("\t" + jsonRow + "\n");
-				
-			}
-			writer.write("}\n");
+		    
+			writer.write(getJSONString());
 			
 		    
 		} catch (IOException ex) {
