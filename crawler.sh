@@ -1,32 +1,32 @@
 #!/bin/bash
 usage()
 {
-    echo "Usage: sh test.sh [-d dataset] [-o output]"
+    echo "Usage: sh crawler.sh [-d dataset]"
     echo "-d dataset"
     echo "    Directory name containing the *.tsv files"
-    echo "-o output"
-    echo "    Directory name where the json files will be created"
 }
 
-if [ "$#" -ne 4 ]
+if [ "$#" -ne 2 ]
 then
     echo "Error: Incorrect number of parameters"
     usage
     exit
 fi
 
-if [ "$1" != "-d" ] || [ "$3" != "-o" ]
+if [ "$1" != "-d" ]
 then
     usage
     exit
 fi
 
-if [ -d "$4" ]
+if [ -d "etllib-json-files" ]
 then
-    if [ "$(ls -A $4/)" ]
+    if [ "$(ls -A etllib-json-files/)" ]
     then
-    rm -r $4/*
+    rm -r etllib-json-files/*
     fi
+else
+    mkdir etllib-json-files
 fi
 
 count=0
@@ -36,8 +36,9 @@ for filename in $2/*.tsv
 do
     count=$((count+1))
     jsonfile=${filename:6:24}
-    tsvtojson -t $filename -j $4/$jsonfile.json -c colheaders.txt -o employment -e encoding.txt
+    /Users/liferayhr/Documents/repositories/etllib/bin/tsvtojson -t $filename -j etllib-json-files/$jsonfile.json -c colheaders.txt -o employment -e encoding.txt
     echo "$count : $jsonfile created."
 done
 
 printf "Total $count JSON files produced.\n\n"
+echo "JSON files stored in etllib-json-files"

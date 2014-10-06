@@ -6,6 +6,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.net.URISyntaxException;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.util.List;
 
 import org.apache.tika.exception.TikaException;
 import org.apache.tika.metadata.Metadata;
@@ -21,50 +24,79 @@ import redis.clients.jedis.Jedis;
 
 public class EmploymentSE 
 {
+	public static String colHeadersFile  = "colheaders.txt";
 	public static String inputFolder  = "assets/";
 	public static String outputFolder = "output/";
 	
 	public static void main(String[] args) throws IOException, SAXException, TikaException, URISyntaxException 
 	{
-		String[] headers = {
-							"Posted Date",
-							"Location",
-							"Department",
-							"Title",
-							"EMPTY",
-							"Salary",
-							"Start",
-							"Duration",
-							"Job Type",
-							"Applications",
-							"Company",
-							"Contact Person",
-							"Phone Number",
-							"Fax Number",
-							"Location",
-							"Latitude",
-							"Longitude",
-							"First Seen Date",
-							"URL",
-							"Last Seen Date"
-							};
-				
-		File directory = new File(inputFolder);
 		
-		if (!directory.exists()) 
-		{
-			System.err.println("Please create a folder called 'assets' and put your *.tsv files");
+		if (args.length != 4) {
+			System.err.println("Please include the following params:");
+			System.err.println("-program [tsv|json] -deduplication [on|off]");
 			System.exit(-1);
 		}
 		
-		directory = new File(outputFolder);
+		String cmdProgram = args[0];
+		String cmdDedup = args[2];
 		
-		if (!directory.exists()) 
-		{
-			directory.mkdir();
+		if (!cmdProgram.equals("-program")||!cmdDedup.equals("-deduplication")) {
+			System.err.println("Unknown parameters. Use:");
+			System.err.println("-program [tsv|json] -deduplication [on|off]");
+			System.exit(-1);
 		}
-
+		
 		long startTime = System.currentTimeMillis();
+		
+		String programType = args[1];
+		String dedupOpt = args[3];
+		
+		boolean deduplicationEnabled = false;
+		if (dedupOpt.equals("on")){
+			deduplicationEnabled = true;
+		}
+		
+		
+		String[] headers = null;
+		
+		if (programType.equals("tsv")) {
+			File colheaders = new File(colHeadersFile);
+			if (!colheaders.exists()) 
+			{
+				System.err.println("Please create a column headers file called 'colHeaders.txt' and put your tsv file headers");
+				System.exit(-1);
+			}
+			
+			List<String> lHeaders = Files.readAllLines(colheaders.toPath(), Charset.defaultCharset());
+			headers = lHeaders.toArray(new String[lHeaders.size()]);
+			
+			File inDirectory = new File(inputFolder);
+			
+			if (!inDirectory.exists()) 
+			{
+				System.err.println("Please create a folder called 'assets' and put your *.tsv files");
+				System.exit(-1);
+			}			
+		}
+		
+		if (programType.equals("json")) {
+			inputFolder = "etllib-json-files/";
+			
+			File jsonDirectory = new File(inputFolder);
+			
+			if (!jsonDirectory.exists()) 
+			{
+				System.err.println("Please run crawler.sh first");
+				System.exit(-1);
+			}
+		}
+		
+		File outDirectory = new File(outputFolder);
+		
+		if (!outDirectory.exists()) 
+		{
+			outDirectory.mkdir();
+		}
 
 		File dataset = new File(inputFolder);
 		int counter = 1;
@@ -80,47 +112,30 @@ public class EmploymentSE
 				String fileName = fileEntry.getName().substring(0, fileEntry.getName().indexOf(".",-1));				
 
 //				//===================== CONVERT TSV TO MULTIPLE JSON FILES =================//
-//				if (!fileName.equals("") && fileType.equals(".tsv"))
-//				{
-//					InputStream input = new FileInputStream(inputFolder + fileEntry.getName());
-//				
-//					//===CREATE A FOLDER FOR EACH PARSED TSV FILE AND PUT JSON FILES THERE==//
-//					//directory = new File(outputFolder + fileName + "/");
-//					//if (!directory.exists()) directory.mkdir();					
-//					//ContentHandler handler = new JSONTableContentHandler(outputFolder + fileName + "/", true, redis);
-//					//======================================================================//
-//				
-//					ContentHandler handler = new JSONTableContentHandler(outputFolder, false);
-//					Metadata metadata = new Metadata();
-//					TSVParser parser = new TSVParser(headers);
-//					parser.parse(input, handler, metadata, new ParseContext());
-//					System.out.println(String.valueOf(counter)+". "+fileEntry.getName()+ ":\t done");
-//					counter++;
-//				}
-//				//==========================================================================//
+				if (!fileName.equals("") && fileType.equals(".tsv"))
+				{
+					InputStream input = new FileInputStream(inputFolder + fileEntry.getName());
 				
-//				//========================= CONVERT TSV TO XHTML FILE ======================//
-//				if (!fileName.equals("") && fileType.equals(".tsv"))
-//				{
-//					InputStream input = new FileInputStream(inputFolder + fileEntry.getName());
-//					ContentHandler handler = new ToXMLContentHandler();
-//					Metadata metadata = new Metadata();
-//					TSVParser parser = new TSVParser(headers);
-//					parser.parse(input, handler, metadata, new ParseContext());
-//
-//					PrintWriter writer = new PrintWriter(outputFolder+fileName+".xhtml","UTF-8");
-//					writer.println(handler.toString());
-//					writer.close();	
-//					System.out.println(String.valueOf(counter)+". "+fileEntry.getName()+ ":\t done");
-//					counter++;
-//				}
+					//===CREATE A FOLDER FOR EACH PARSED TSV FILE AND PUT JSON FILES THERE==//
+					//directory = new File(outputFolder + fileName + "/");
+					//if (!directory.exists()) directory.mkdir();					
+					//ContentHandler handler = new JSONTableContentHandler(outputFolder + fileName + "/", true, redis);
+					//======================================================================//
+				
+					ContentHandler handler = new JSONTableContentHandler(outputFolder, deduplicationEnabled);
+					Metadata metadata = new Metadata();
+					TSVParser parser = new TSVParser(headers);
+					parser.parse(input, handler, metadata, new ParseContext());
+					System.out.println(String.valueOf(counter)+". "+fileEntry.getName()+ ":\t done");
+					counter++;
+				}
 //				//==========================================================================//
 				
 //				//====================== SPLIT JSON TO MULTIPLE JSON FILES =================//
 				if (!fileName.equals("") && fileType.equals(".json"))
 				{
 					JSONSplitter splitter = new JSONSplitter();
-					JSONcounter+= splitter.SplitSourceFile(inputFolder+fileEntry.getName(), outputFolder, false, false);										
+					JSONcounter+= splitter.SplitSourceFile(inputFolder+fileEntry.getName(), outputFolder, deduplicationEnabled, true);										
 					System.out.println(String.valueOf(counter)+". "+fileEntry.getName()+ ":\t done");
 					counter++;				
 				}

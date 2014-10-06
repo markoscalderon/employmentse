@@ -24,6 +24,11 @@ jar {
     }
 }
 
+run {
+    systemProperties System.getProperties()
+    args System.getProperty("exec.args").split()
+}
+
 task wrapper(type: Wrapper) {
     gradleVersion = '2.0'
 }
