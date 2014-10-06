@@ -78,11 +78,14 @@ public class EmploymentSE
 				if (!fileName.equals("") && fileType.equals(".tsv"))
 				{
 					InputStream input = new FileInputStream(inputFolder + fileEntry.getName());
-					//directory = new File(outputFolder + fileName + "/");
-					//if (!directory.exists()) directory.mkdir();					
-					//ContentHandler handler = new JSONTableContentHandler(outputFolder + fileName + "/", false);
+									
+//					============================ OUTPUT JSON FILES =============================//
+					directory = new File(outputFolder + fileName + "/");
+					if (!directory.exists()) directory.mkdir();
 					
-					ContentHandler handler = new JSONTableContentHandler(outputFolder, false);
+					//ContentHandler handler = new JSONTableContentHandler(outputFolder, false);
+					ContentHandler handler = new JSONTableContentHandler(outputFolder + fileName + "/", false);
+
 					Metadata metadata = new Metadata();
 					TSVParser parser = new TSVParser(headers);
 					parser.parse(input, handler, metadata, new ParseContext());
