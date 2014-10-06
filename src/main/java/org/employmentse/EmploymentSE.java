@@ -68,35 +68,38 @@ public class EmploymentSE
 
 		File dataset = new File(inputFolder);
 		int counter = 1;
-		Jedis redis = new Jedis("localhost");
+//		Jedis redis = new Jedis("localhost");
+
+		int JSONcounter = 0;
+		
 		for (final File fileEntry : dataset.listFiles()) 
 		{			
 			if (!fileEntry.isDirectory())
 			{
 				String fileType = fileEntry.getName().substring(fileEntry.getName().indexOf(".",-1),fileEntry.getName().length());
-				String fileName = fileEntry.getName().substring(0, fileEntry.getName().indexOf(".",-1));
-				
-//				===================== CONVERT TSV TO MULTIPLE JSON FILES ===================//
-				if (!fileName.equals("") && fileType.equals(".tsv"))
-				{
-					InputStream input = new FileInputStream(inputFolder + fileEntry.getName());
-									
-//					============================ OUTPUT JSON FILES =============================//
-//					directory = new File(outputFolder + fileName + "/");
-//					if (!directory.exists()) directory.mkdir();
-					
-					ContentHandler handler = new JSONTableContentHandler(outputFolder, false);
-//					ContentHandler handler = new JSONTableContentHandler(outputFolder + fileName + "/", true, redis);
+				String fileName = fileEntry.getName().substring(0, fileEntry.getName().indexOf(".",-1));				
 
-					Metadata metadata = new Metadata();
-					TSVParser parser = new TSVParser(headers);
-					parser.parse(input, handler, metadata, new ParseContext());
-					System.out.println(String.valueOf(counter)+". "+fileEntry.getName()+ ":\t done");
-					counter++;
-				}
-//				============================================================================//
+//				//===================== CONVERT TSV TO MULTIPLE JSON FILES =================//
+//				if (!fileName.equals("") && fileType.equals(".tsv"))
+//				{
+//					InputStream input = new FileInputStream(inputFolder + fileEntry.getName());
+//				
+//					//===CREATE A FOLDER FOR EACH PARSED TSV FILE AND PUT JSON FILES THERE==//
+//					//directory = new File(outputFolder + fileName + "/");
+//					//if (!directory.exists()) directory.mkdir();					
+//					//ContentHandler handler = new JSONTableContentHandler(outputFolder + fileName + "/", true, redis);
+//					//======================================================================//
+//				
+//					ContentHandler handler = new JSONTableContentHandler(outputFolder, false);
+//					Metadata metadata = new Metadata();
+//					TSVParser parser = new TSVParser(headers);
+//					parser.parse(input, handler, metadata, new ParseContext());
+//					System.out.println(String.valueOf(counter)+". "+fileEntry.getName()+ ":\t done");
+//					counter++;
+//				}
+//				//==========================================================================//
 				
-//				========================== CONVERT TSV TO XHTML FILE =======================//
+//				//========================= CONVERT TSV TO XHTML FILE ======================//
 //				if (!fileName.equals("") && fileType.equals(".tsv"))
 //				{
 //					InputStream input = new FileInputStream(inputFolder + fileEntry.getName());
@@ -111,25 +114,26 @@ public class EmploymentSE
 //					System.out.println(String.valueOf(counter)+". "+fileEntry.getName()+ ":\t done");
 //					counter++;
 //				}
-//				============================================================================//
+//				//==========================================================================//
 				
-//				======================== SPLIT JSON TO MULTIPLE JSON FILES =================//
-//				if (!fileName.equals("") && fileType.equals(".json"))
-//				{
-//					JSONSplitter splitter = new JSONSplitter();
-//					splitter.SplitSourceFile(inputFolder+fileEntry.getName(), outputFolder, false);
-//					
-//					//try {if(!new File(inputFolder+fileEntry.getName()).delete())
-//					//{System.out.println(inputFolder+fileEntry.getName()+" delete failed");}}					
-//					//catch (Exception e){e.printStackTrace();}
-//					
-//					System.out.println(String.valueOf(counter)+". "+fileEntry.getName()+ ":\t done");
-//					counter++;				
-//				}
-//				============================================================================//
+//				//====================== SPLIT JSON TO MULTIPLE JSON FILES =================//
+				if (!fileName.equals("") && fileType.equals(".json"))
+				{
+					JSONSplitter splitter = new JSONSplitter();
+					JSONcounter+= splitter.SplitSourceFile(inputFolder+fileEntry.getName(), outputFolder, false, false);										
+					System.out.println(String.valueOf(counter)+". "+fileEntry.getName()+ ":\t done");
+					counter++;				
+				}
+//				//==========================================================================//
+								
+//				//======= DELETE SOURCE FILE AFTER PARSING. USEFUL FOR SPACE SAVING ========//
+//				try {if(!new File(inputFolder+fileEntry.getName()).delete())
+//				{System.out.println(inputFolder+fileEntry.getName()+" delete failed");}}					
+//				catch (Exception e){e.printStackTrace();}
+//				//==========================================================================//								
 			}
 		}	
-		redis.close();
+//		redis.close();
 		long finishTime = System.currentTimeMillis();
 		long elapsedTime = finishTime-startTime;
 
@@ -144,5 +148,6 @@ public class EmploymentSE
 		String MS = String.valueOf(ms); if (ms<10){MS="0"+MS;}
 		
 		System.out.println("\nParsing completed\nProcessing time: "+HH+":"+MM+":"+SS+"."+MS);
+		if (JSONcounter>0) {System.out.println(JSONcounter+" job positions found");}
 	}
 }

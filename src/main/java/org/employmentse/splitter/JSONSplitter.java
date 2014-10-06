@@ -38,11 +38,13 @@ public class JSONSplitter
 		return features;
 	}
 	
-	public void SplitSourceFile(String inputPath, String outputPath, Boolean enableDeduplication) throws IOException
+	public int SplitSourceFile(String inputPath, String outputPath, Boolean enableDeduplication, Boolean createFiles) throws IOException
 	{		
 		this.output = outputPath;
 		this.enableDeduplication = enableDeduplication;
-				
+		
+		int numberOfJSONFilesProduced=0;
+		
 		BufferedReader reader = new BufferedReader(new FileReader(inputPath));	
 		try 
         {
@@ -54,18 +56,18 @@ public class JSONSplitter
 			int n = reader.read(bufferCharacters);
 		
 			while (n!=-1) 
-			{
-				String bufferString = new String(bufferCharacters).replaceAll("\\}, \\{","|");
+			{				
+				String bufferString = new String(bufferCharacters).replaceAll("\\}, \\{","\t\t\t");
 				if (bufferString.indexOf("[{")>0) {bufferString=bufferString.substring(bufferString.indexOf("[{")+2,bufferString.length());}	
 				if (bufferString.indexOf("]}")>0) {bufferString=bufferString.substring(0,bufferString.indexOf("]}")-1);} 
 								
 				bufferString = lastElement + bufferString;
-				String[] bufferElements = bufferString.split("[|]+");
+				String[] bufferElements = bufferString.split("\t{3}");
 				
 				for (String element : bufferElements)	
 				{	
 					String items[] = element.split("\", \"");
-					if (items.length != numberOfColumns-1) {lastElement = element;}					
+					if (items.length < numberOfColumns) {lastElement = element;}					
 					else
 					{
 						boolean addRow = true; 
@@ -77,10 +79,13 @@ public class JSONSplitter
 							FingerPrint fpValue = new FingerPrint(getKeyFields());
 							elementList.clear();
 						
-							if (deduplicator.isDuplicate(fpValue.toString())) {addRow = false;}							
-							deduplicator.addJob(fpValue.toString());
+							if (deduplicator.isNearDuplicate(items[7],fpValue)) {addRow = false;}
+							deduplicator.addFingerPrint(items[7], fpValue);
 						}					
-						if (addRow) {CreateJSONFile(element, this.output);}						
+						if (addRow) 
+						{
+							if (createFiles) CreateJSONFile(element, this.output); numberOfJSONFilesProduced++;
+						}						
 					} 
 				}				
 				bufferCharacters = new char[bufferSize];        		
@@ -88,7 +93,7 @@ public class JSONSplitter
 			}
         }
 		catch (Exception e){e.printStackTrace();}		
-		finally {reader.close();}		
+		finally {reader.close(); return numberOfJSONFilesProduced;}		
 	}
 	
 	public void CreateJSONFile(String dataset, String output) throws FileNotFoundException, UnsupportedEncodingException
