@@ -22,7 +22,7 @@ The EmploymentSE program is composed on 4 main components:
     
     Description: This class extends from SafeContentHandler and implements the methods characters, startElement and endElement. It generates the output of individual json files based on the rows from a table during the XHTML creation with a tika parser. It is possible to enable or disable deduplication tecniques.
 
-3. **Deduplication **
+3. **Deduplication**
 
     Package: org.employmentse.deduplication
     
