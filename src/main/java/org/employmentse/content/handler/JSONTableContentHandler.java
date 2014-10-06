@@ -51,33 +51,20 @@ public class JSONTableContentHandler extends SafeContentHandler {
 	private final Deduplicator deduplicator = new Deduplicator(); 
 	private boolean enableDeduplication = false;
 	
-	Jedis redis;
+//	Jedis redis;
+//	private String filename;
 	
+//	public JSONTableContentHandler(String output, boolean enableDeduplication, Jedis redis) throws URISyntaxException
 	public JSONTableContentHandler(String output, boolean enableDeduplication) throws URISyntaxException 
 	{
 		super(new DefaultHandler());
 		
-		redis = new Jedis("localhost");
-		
+//		this.redis = redis;
+//		this.filename = output.replaceFirst(".*/([^/?]+).*", "$1");
 		this.output = output;
 		this.enableDeduplication = enableDeduplication;
 		
-		File[] fileArray = new File(this.output).listFiles(new FilenameFilter() 
-		{
-		    public boolean accept(File dir, String name) 
-		    {return name.toLowerCase().endsWith(".json");}		    
-		});
-												
-		if (fileArray.length != 0) 
-		{		
-			String lastFileName = fileArray[0].getName().substring(0, fileArray[0].getName().indexOf(".",-1));			
-			for (int i=1; i<fileArray.length; i++) 
-			{
-				String currentFileName = fileArray[i].getName().substring(0, fileArray[i].getName().indexOf(".",-1));	
-				if (Integer.parseInt(lastFileName) < Integer.parseInt(currentFileName)) {lastFileName=currentFileName;}
-			}
-			rowNumber=Integer.parseInt(lastFileName)+1;
-		}
+		recalculateRowNumber();
 	}
 	
 	@Override
@@ -137,34 +124,33 @@ public class JSONTableContentHandler extends SafeContentHandler {
 				addRow = false;
 				
 				List<String> features = getFeatures();
-				String featuresHashCode = Integer.toString(features.hashCode());
-				
-				if (!deduplicator.isDuplicate(featuresHashCode)) {
-					FingerPrint fp1 = new FingerPrint(features);
-					if (!deduplicator.isNearDuplicate(currentRow.get(10), fp1)) {
-						addRow = true;
-						
-						deduplicator.addFingerPrint(currentRow.get(10), fp1);
-					}
+
+				FingerPrint fp1 = new FingerPrint(features);
+				if (!deduplicator.isNearDuplicate(currentRow.get(10), fp1)) {
+					addRow = true;
 					
-					deduplicator.addJob(featuresHashCode);
-				}
+					deduplicator.addFingerPrint(currentRow.get(10), fp1);
+				} 
 				
 			}
 			
 			if (addRow) {
 				writeRowToFile(this.output + Integer.toString(rowNumber) + ".json");
 				
-//				String filename = this.output.replaceFirst(".*/([^/?]+).*", "$1");
+				
 //				String key = "jobs:" + filename + ":" + rowNumber;
-//				redis.set(key, getJSONString());
-//				redis.incr("jobs:total");
+//				
+//				if(!redis.exists(key)){
+//					redis.set(key, getJSONString());
+//					redis.incr("run2:jobs:" + filename);
+//					redis.incr("run2:jobs:total");
+//				}
 				
 				rowNumber++;
 			} else {
-//				String key = "duplicates:" + filename;
-//				redis.rpush(key, getJSONString());
-//				redis.incr("duplicates:total");
+//				String key = "run2:duplicates:" + filename;
+//				redis.incr(key);
+//				redis.incr("run2:duplicates:total");
 			}
 			
 			currentRow.clear();
@@ -172,12 +158,7 @@ public class JSONTableContentHandler extends SafeContentHandler {
 		}
 		
 	}
-	
-	@Override
-	public void endDocument() throws SAXException {
-		redis.close();
-	}
-	
+
 	private List<String> getFeatures() {
 		List<String> features = new ArrayList<String>();
 		
@@ -229,6 +210,25 @@ public class JSONTableContentHandler extends SafeContentHandler {
 			System.err.println("localName = " + localName);
 			System.err.println("qName = " + qName);
 			System.exit(1);
+		}
+	}
+	
+	private void recalculateRowNumber() {
+		File[] fileArray = new File(this.output).listFiles(new FilenameFilter() 
+		{
+		    public boolean accept(File dir, String name) 
+		    {return name.toLowerCase().endsWith(".json");}		    
+		});
+												
+		if (fileArray.length != 0) 
+		{		
+			String lastFileName = fileArray[0].getName().substring(0, fileArray[0].getName().indexOf(".",-1));			
+			for (int i=1; i<fileArray.length; i++) 
+			{
+				String currentFileName = fileArray[i].getName().substring(0, fileArray[i].getName().indexOf(".",-1));	
+				if (Integer.parseInt(lastFileName) < Integer.parseInt(currentFileName)) {lastFileName=currentFileName;}
+			}
+			rowNumber=Integer.parseInt(lastFileName)+1;
 		}
 	}
 	

@@ -17,6 +17,8 @@ import org.employmentse.splitter.JSONSplitter;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 
+import redis.clients.jedis.Jedis;
+
 public class EmploymentSE 
 {
 	public static String inputFolder  = "assets/";
@@ -66,7 +68,7 @@ public class EmploymentSE
 
 		File dataset = new File(inputFolder);
 		int counter = 1;
-		
+		Jedis redis = new Jedis("localhost");
 		for (final File fileEntry : dataset.listFiles()) 
 		{			
 			if (!fileEntry.isDirectory())
@@ -80,11 +82,11 @@ public class EmploymentSE
 					InputStream input = new FileInputStream(inputFolder + fileEntry.getName());
 									
 //					============================ OUTPUT JSON FILES =============================//
-					directory = new File(outputFolder + fileName + "/");
-					if (!directory.exists()) directory.mkdir();
+//					directory = new File(outputFolder + fileName + "/");
+//					if (!directory.exists()) directory.mkdir();
 					
-					//ContentHandler handler = new JSONTableContentHandler(outputFolder, false);
-					ContentHandler handler = new JSONTableContentHandler(outputFolder + fileName + "/", false);
+					ContentHandler handler = new JSONTableContentHandler(outputFolder, false);
+//					ContentHandler handler = new JSONTableContentHandler(outputFolder + fileName + "/", true, redis);
 
 					Metadata metadata = new Metadata();
 					TSVParser parser = new TSVParser(headers);
@@ -121,7 +123,8 @@ public class EmploymentSE
 //				}
 //				============================================================================//
 			}
-		}		
+		}	
+		redis.close();
 		long finishTime = System.currentTimeMillis();
 		long elapsedTime = finishTime-startTime;
 

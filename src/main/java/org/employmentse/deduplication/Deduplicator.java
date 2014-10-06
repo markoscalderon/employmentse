@@ -33,7 +33,7 @@ public class Deduplicator {
 		if (existing == null) {
 			Set<FingerPrint> existingJobsFromDB = new HashSet<FingerPrint>();
 			
-			for (byte[] data : redis.smembers(("fingerprints:" + key).getBytes())) {
+			for (byte[] data : redis.smembers(("run2:fingerprints:" + key).getBytes())) {
 				existingJobsFromDB.add(FingerPrint.deserialize(data));
 			}
 			
@@ -48,10 +48,6 @@ public class Deduplicator {
 			existingJobsPerKey.put(key, existingJobs);
 		}
 		return existingJobs;
-	}
-	
-	public boolean isDuplicate(String featureHashCode) {
-		return redis.sismember("deduplicator:jobs", featureHashCode);
 	}
 	
 	public boolean isNearDuplicate(String key, FingerPrint fp1) {
@@ -80,14 +76,10 @@ public class Deduplicator {
 		existingJobsPerKey.put(key, jobs);
 		
 		try {
-			redis.sadd(("fingerprints:" + key).getBytes(), FingerPrint.serialize(fp));
+			redis.sadd(("run2:fingerprints:" + key).getBytes(), FingerPrint.serialize(fp));
 		} catch (IOException e) {
 			System.out.println("Exception: " + e);
 		}
-	}
-	
-	public void addJob(String featureHashCode) {
-		redis.sadd("deduplicator:jobs", featureHashCode);
 	}
 
 }

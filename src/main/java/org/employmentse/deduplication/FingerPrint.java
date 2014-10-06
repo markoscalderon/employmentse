@@ -24,18 +24,12 @@ public class FingerPrint implements Serializable {
 	
 	public FingerPrint(List<String> features) {
 		for (int i = 0; i < features.size(); i++) {
-			if (i == titleIDX) {
-//				shingleHashes.addAll(get2Grams(features.get(i)));
-				shingleHashes.add(features.get(i).hashCode());
-			} else {
-				shingleHashes.add(features.get(i).hashCode());
-			}
+			shingleHashes.add(features.get(i).hashCode());
 		}
 	}
 	
 	private Set<Integer> get2Grams(String string) {
 		System.out.println("shingling " + string);
-		// TODO Auto-generated method stub
 		String[] words = string.split("\\s+");
 		
 		Set<Integer> shingleHashes = new HashSet<>();
