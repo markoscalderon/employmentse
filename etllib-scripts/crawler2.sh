@@ -1,4 +1,7 @@
 #!/bin/bash
+# 1. put this script in the same folder with the following files: "tsvtojson", "colheaders.txt", "encoding.txt"
+# 2. use the following command: time sh crawler2.sh -d [path/to/input/folder] -o [path/to/output/folder]
+
 usage()
 {
     echo "Usage: sh test.sh [-d dataset] [-o output]"
@@ -25,19 +28,20 @@ if [ -d "$4" ]
 then
     if [ "$(ls -A $4/)" ]
     then
-    rm -r $4/*
+    rm -r $4/* 2> /dev/null
     fi
 fi
 
 count=0
 printf "Processing, please wait...\n\n"
-
-for filename in $2/*.tsv
+for input_file in $2/*.tsv
 do
     count=$((count+1))
-    jsonfile=${filename:6:24}
-    tsvtojson -t $filename -j $4/$jsonfile.json -c colheaders.txt -o employment -e encoding.txt
-    echo "$count : $jsonfile created."
-done
+    output_file=$(basename "$input_file")
+    output_file="${output_file%.*}.json"
+    #extension="${output_file##*.}"
 
+    tsvtojson -t $input_file -j $4/$output_file -c colheaders.txt -o employment -e encoding.txt
+    echo "$count : $output_file created."
+done
 printf "Total $count JSON files produced.\n\n"

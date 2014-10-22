@@ -63,14 +63,14 @@ public class EmploymentSE
 		{
 			directory.mkdir();
 		}
-
-		long startTime = System.currentTimeMillis();
-
-		File dataset = new File(inputFolder);
-		int counter = 1;
 //		Jedis redis = new Jedis("localhost");
-
-		int JSONcounter = 0;
+		
+		long startTime = System.currentTimeMillis();
+		File dataset = new File(inputFolder);
+				
+		int sourcefileCounter = 1;
+		int jobsPerFileCounter = 0;
+		int jobsTotalCounter = 0;
 		
 		for (final File fileEntry : dataset.listFiles()) 
 		{			
@@ -90,7 +90,7 @@ public class EmploymentSE
 //					//ContentHandler handler = new JSONTableContentHandler(outputFolder + fileName + "/", true, redis);
 //					//======================================================================//
 //				
-//					ContentHandler handler = new JSONTableContentHandler(outputFolder, false);
+//					ContentHandler handler = new JSONTableContentHandler(outputFolder, true);
 //					Metadata metadata = new Metadata();
 //					TSVParser parser = new TSVParser(headers);
 //					parser.parse(input, handler, metadata, new ParseContext());
@@ -120,9 +120,9 @@ public class EmploymentSE
 				if (!fileName.equals("") && fileType.equals(".json"))
 				{
 					JSONSplitter splitter = new JSONSplitter();
-					JSONcounter+= splitter.SplitSourceFile(inputFolder+fileEntry.getName(), outputFolder, false, false);										
-					System.out.println(String.valueOf(counter)+". "+fileEntry.getName()+ ":\t done");
-					counter++;				
+					jobsPerFileCounter= splitter.SplitSourceFile(inputFolder+fileEntry.getName(), outputFolder, true, true);
+					System.out.println(String.valueOf(sourcefileCounter)+". "+fileEntry.getName()+ ":\t jobs parsed: "+String.valueOf(jobsPerFileCounter));
+					sourcefileCounter++; jobsTotalCounter+=jobsPerFileCounter;
 				}
 //				//==========================================================================//
 								
@@ -148,6 +148,6 @@ public class EmploymentSE
 		String MS = String.valueOf(ms); if (ms<10){MS="0"+MS;}
 		
 		System.out.println("\nParsing completed\nProcessing time: "+HH+":"+MM+":"+SS+"."+MS);
-		if (JSONcounter>0) {System.out.println(JSONcounter+" job positions found");}
+		if (jobsTotalCounter>0) {System.out.println(jobsTotalCounter+" job positions found");}
 	}
 }

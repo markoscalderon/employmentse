@@ -51,15 +51,19 @@ public class JSONSplitter
 			int bufferSize = 4096;
 			int numberOfColumns = 21;
 			String lastElement = "";
+			String startPattern = "\\{\"employment\":\\s*\\[";
+			String endPattern 	= "\\}\\]\\}";
 								
 			char[] bufferCharacters = new char[bufferSize];
 			int n = reader.read(bufferCharacters);
 		
 			while (n!=-1) 
 			{				
-				String bufferString = new String(bufferCharacters).replaceAll("\\}, \\{","\t\t\t");
-				if (bufferString.indexOf("[{")>0) {bufferString=bufferString.substring(bufferString.indexOf("[{")+2,bufferString.length());}	
-				if (bufferString.indexOf("]}")>0) {bufferString=bufferString.substring(0,bufferString.indexOf("]}")-1);} 
+				String bufferString = new String(bufferCharacters)
+					 				.replaceAll(startPattern,"")
+					 				.replaceAll(endPattern,"")
+					 				.replaceAll("\\s*\\{","")
+					 				.replaceAll("\\},*","\t\t\t");
 								
 				bufferString = lastElement + bufferString;
 				String[] bufferElements = bufferString.split("\t{3}");
@@ -67,9 +71,10 @@ public class JSONSplitter
 				for (String element : bufferElements)	
 				{	
 					String items[] = element.split("\", \"");
-					if (items.length < numberOfColumns) {lastElement = element;}					
+					if (items.length < numberOfColumns) {lastElement = element;} 
 					else
 					{
+						lastElement ="";
 						boolean addRow = true; 
 					
 						if (enableDeduplication) 
@@ -80,13 +85,14 @@ public class JSONSplitter
 							elementList.clear();
 						
 							if (deduplicator.isNearDuplicate(items[7],fpValue)) {addRow = false;}
-							deduplicator.addFingerPrint(items[7], fpValue);
+							else {deduplicator.addFingerPrint(items[7], fpValue);}
 						}					
-						if (addRow) 
+						if (addRow)
 						{
-							if (createFiles) CreateJSONFile(element, this.output); numberOfJSONFilesProduced++;
+							if (createFiles) CreateJSONFile(element, this.output); 
+							numberOfJSONFilesProduced++;
 						}						
-					} 
+					} 					
 				}				
 				bufferCharacters = new char[bufferSize];        		
 				n = reader.read(bufferCharacters);
