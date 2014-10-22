@@ -51,16 +51,10 @@ public class JSONTableContentHandler extends SafeContentHandler {
 	private final Deduplicator deduplicator = new Deduplicator(); 
 	private boolean enableDeduplication = false;
 	
-//	Jedis redis;
-//	private String filename;
-	
-//	public JSONTableContentHandler(String output, boolean enableDeduplication, Jedis redis) throws URISyntaxException
 	public JSONTableContentHandler(String output, boolean enableDeduplication) throws URISyntaxException 
 	{
 		super(new DefaultHandler());
 		
-//		this.redis = redis;
-//		this.filename = output.replaceFirst(".*/([^/?]+).*", "$1");
 		this.output = output;
 		this.enableDeduplication = enableDeduplication;
 		
@@ -137,20 +131,7 @@ public class JSONTableContentHandler extends SafeContentHandler {
 			if (addRow) {
 				writeRowToFile(this.output + Integer.toString(rowNumber) + ".json");
 				
-				
-//				String key = "jobs:" + filename + ":" + rowNumber;
-//				
-//				if(!redis.exists(key)){
-//					redis.set(key, getJSONString());
-//					redis.incr("run2:jobs:" + filename);
-//					redis.incr("run2:jobs:total");
-//				}
-				
 				rowNumber++;
-			} else {
-//				String key = "run2:duplicates:" + filename;
-//				redis.incr(key);
-//				redis.incr("run2:duplicates:total");
 			}
 			
 			currentRow.clear();
