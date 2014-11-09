@@ -53,7 +53,7 @@ public class EmploymentSE
 		
 		if (!directory.exists()) 
 		{
-			System.err.println("Please create a folder called 'assets' and put your *.tsv files");
+			System.err.println("Please create a folder called 'assets' and put your files there");
 			System.exit(-1);
 		}
 		
