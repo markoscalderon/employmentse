@@ -1,0 +1,5 @@
+vendedor
+promotor
+ventas
+ejecutivo comerciales
+preventa

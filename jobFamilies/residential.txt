@@ -1,0 +1,14 @@
+Cartero
+Repartidor
+cocinero
+empleada
+niñera
+camarero
+bartender
+mucama
+barman
+pastelero
+supermercado
+restaurante
+restoran
+herrero

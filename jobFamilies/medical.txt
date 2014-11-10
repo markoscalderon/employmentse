@@ -1,0 +1,7 @@
+clinica
+hospital
+medico
+enfermera
+dentista
+odontologia
+analista laboratorio

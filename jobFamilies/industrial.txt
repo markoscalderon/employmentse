@@ -1,0 +1,21 @@
+supervisor produccion
+operador sistemas
+infraestructura nivel
+gerente logistica
+tecnico calidad
+operario
+electronico
+quimico
+telecomunicaciones
+electromecanico
+tecnico mecanico
+industrial
+operador noc
+operario mantenimiento
+operario produccion
+analista infraestructura
+electricista
+tecnico mantenimiento
+tecnico infraestructura
+tecnico energia
+produccion
